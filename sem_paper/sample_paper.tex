@@ -110,7 +110,7 @@ This paper looks at Optical Character Recognition(OCR) as a means to improve usa
 %%
 %% Keywords. The author(s) should pick words that accurately describe
 %% the work being presented. Separate the keywords with commas.
-\keywords{datasets, neural networks, gaze detection, text tagging}
+\keywords{optical character recognition, scanned documents, visual noise, datasets}
 
 
 %%
@@ -125,25 +125,17 @@ Scanned documents are images of existing documents. They are typically made with
 Some of these issues are longer loading times, issues with searching within the document, and accessibility issues for screen readers.\footnote{one of these is not like the other...} 
 One way to improve the usability of these documents is to digitize them. The most straightforward way to do this is to copy the contents of the document by hand into a new file. This does not scale well, so we look to Optical Character Recognition to automate the process. 
 
+\section{Background}
+\label{sec:background}
 OCR is broken up into -- steps
 
 The output of OCR is given in many different ways. One of the more popular outputs is as the accuracy percentage.
 
 The output of OCR is a text document
-
+\cite{Raj:2022,Avyodri:2022,Thorat:2022}
 \todo[inline]{Formula?}
 
-\todo{(Raj & Kos, 2022), (Avyodri et al., 2022), (Thorat et al., 2022)}
-
-Methods - describe things that make OCR less accurate
-Layout - too many layouts to cover them all 
-Alphabet - familiar with the latin one, but so many others exist (Fateh et al., 2023) and (Hegghammer, 2022)
-Noise - There’s so many ways to scan a document badly. (Hegghammer, 2022)
-Results - some specialized datasets exist (Fateh et al., 2023) and (Hegghammer, 2022)
-Conclusion - While it’s ideal to have one golden benchmarking set, that's hard (because of the reasons outlined above), so now we have specialized ones.
-Acknowledgements
-
-\section{The {\it Body} of The Paper}
+\section{Challenges}
 \label{sec:body}
 
 There are three main categories of things that make scanned documents harder to digitize. 
@@ -151,350 +143,30 @@ There are three main categories of things that make scanned documents harder to 
 \subsection{Layout}
 \label{sec:Layout}
 
-Documents come in many differnt layouts. Some papers, like this one, are organized in two columns, some have one, some have sidebars and images. There exists too many ways to format a page to make an OCR well suited for all of them.
+Layout - too many layouts to cover them all
 
-\subsection{Alphebet}
+Documents come in many different layouts. Some papers, like this one, are organized in two columns, some have one, some have sidebars and images. There exists too many ways to format a page to make an OCR well suited for all of them.
+
+\subsection{Alphabet}
 \label{sec:Alphabet}
 
-Most OCR are trained on the Latin Alphabet. This inherently gives all other languages a bit of a disadvantage. Other alphabets also have nuances that make it harder to directly apply OCR to. A common example is Arabic. (there's dots)  
+Most OCR are trained on the Latin Alphabet. This inherently gives all other languages a bit of a disadvantage. Other alphabets also have nuances that make it harder to directly apply OCR to. A common example is Arabic. (there's dots) \cite{Fateh:2024, Hegghamer:2022}
 
-We have already seen several typeface changes in this sample.  You
-can indicate italicized words or phrases in your text with
-the command \texttt{\textbackslash textit}; emboldening with the
-command \texttt{\textbackslash textbf}
-and typewriter-style (for instance, for computer code) with
-\texttt{\textbackslash texttt}.
-As a rule you'd prefer \texttt{\textbackslash emph} (which stands for \emph{emphasize})
-over something like \texttt{\textbackslash textit} since that gives the typesetting system
-more flexibility in how it can emphasize that text.
+\subsection{Visual Noise}
+\label{sec:Noise}
 
-You do not
-have to indicate typestyle changes when such changes are
-part of the \textit{structural} elements of your
-article; for instance, the heading of this subsection will
-be in a sans serif\footnote{A third footnote, here.
-Let's make this a rather short one to
-see how it looks.} typeface, but that is handled by the
-document class file. Take care with the use
-of\footnote{A fourth, and last, footnote.}
-the curly braces in typeface changes; they mark
-the beginning and end of
-the text that is to be in the different typeface.
+There’s so many ways to scan a document badly. \cite{Hegghamer:2022}
 
-You can use whatever symbols, accented characters, or
-non-English characters you need anywhere in your document;
-you can find a complete list of what is
-available in the \textit{\LaTeX\
-User's Guide}~\cite{Lamport:LaTeX}.
+\section{Results}
+\label{sec:Results}
 
+Results - some specialized datasets exist \cite{Fateh:2024,Hegghamer:2022}
 
-\section{Sectioning Commands}
+\section{Conclusion}
+\label{sec:Conclusion}
 
-Your work should use standard \LaTeX\ sectioning commands:
-\verb|section|, \verb|subsection|, \verb|subsubsection|, and
-\verb|paragraph|. They should be numbered; do not remove the numbering
-from the commands.
-
-Simulating a sectioning command by setting the first word or words of
-a paragraph in boldface or italicized text is {\bfseries not allowed.}
-
-\section{Tables}
-
-The ``\verb|acmart|'' document class includes the ``\verb|booktabs|''
-package --- \url{https://ctan.org/pkg/booktabs} --- for preparing
-high-quality tables.
-
-Table captions are placed \textit{above} the table.
-
-Because tables cannot be split across pages, the best placement for
-them is typically the top of the page nearest their initial cite.  To
-ensure this proper ``floating'' placement of tables, use the
-environment \textbf{table} to enclose the table's contents and the
-table caption.  The contents of the table itself must go in the
-\textbf{tabular} environment, to be aligned properly in rows and
-columns, with the desired horizontal and vertical rules.  Again,
-detailed instructions on \textbf{tabular} material are found in the
-\textit{\LaTeX\ User's Guide}.
-
-Immediately following this sentence is the point at which
-Table~\ref{tab:freq} is included in the input file; compare the
-placement of the table here with the table in the printed output of
-this document.
-
-\begin{table}
-  \caption{Frequency of Special Characters}
-  \label{tab:freq}
-  \begin{tabular}{ccl}
-    \toprule
-    Non-English or Math&Frequency&Comments\\
-    \midrule
-    \O & 1 in 1,000& For Swedish names\\
-    $\pi$ & 1 in 5& Common in math\\
-    \$ & 4 in 5 & Used in business\\
-    $\Psi^2_1$ & 1 in 40,000& Unexplained usage\\
-  \bottomrule
-\end{tabular}
-\end{table}
-
-To set a wider table, which takes up the whole width of the page's
-live area, use the environment \textbf{table*} to enclose the table's
-contents and the table caption.  As with a single-column table, this
-wide table will ``float'' to a location deemed more
-desirable. Immediately following this sentence is the point at which
-Table~\ref{tab:commands} is included in the input file; again, it is
-instructive to compare the placement of the table here with the table
-in the printed output of this document.
-
-\begin{table*}
-  \caption{Some Typical Commands}
-  \label{tab:commands}
-  \begin{tabular}{ccl}
-    \toprule
-    Command &A Number & Comments\\
-    \midrule
-    \texttt{{\char'134}author} & 100& Author \\
-    \texttt{{\char'134}table}& 300 & For tables\\
-    \texttt{{\char'134}table*}& 400& For wider tables\\
-    \bottomrule
-  \end{tabular}
-\end{table*}
-
-Always use midrule to separate table header rows from data rows, and
-use it only for this purpose. This enables assistive technologies to
-recognise table headers and support their users in navigating tables
-more easily.
-
-\section{Math Equations}
-You may want to display math equations in three distinct styles:
-inline, numbered or non-numbered display.  Each of the three are
-discussed in the next sections.
-
-\subsection{Inline (In-text) Equations}
-A formula that appears in the running text is called an inline or
-in-text formula.  It is produced by the \textbf{math} environment,
-which can be invoked with the usual
-\texttt{{\char'134}begin\,\ldots{\char'134}end} construction or with
-the short form \texttt{\$\,\ldots\$}. You can use any of the symbols
-and structures, from $\alpha$ to $\omega$, available in
-\LaTeX~\cite{Lamport:LaTeX}; this section will simply show a few
-examples of in-text equations in context. Notice how this equation:
-\begin{math}
-  \lim_{n\rightarrow \infty}x=0
-\end{math},
-set here in in-line math style, looks slightly different when
-set in display style.  (See next section).
-
-\subsection{Display Equations}
-A numbered display equation---one set off by vertical space from the
-text and centered horizontally---is produced by the \textbf{equation}
-environment. An unnumbered display equation is produced by the
-\textbf{displaymath} environment.
-
-Again, in either environment, you can use any of the symbols and
-structures available in \LaTeX\@; this section will just give a couple
-of examples of display equations in context.  First, consider the
-equation, shown as an inline equation above:
-\begin{equation}
-  \lim_{n\rightarrow \infty}x=0
-\end{equation}
-Notice how it is formatted somewhat differently in
-the \textbf{displaymath}
-environment.  Now, we'll enter an unnumbered equation:
-\begin{displaymath}
-  \sum_{i=0}^{\infty} x + 1
-\end{displaymath}
-and follow it with another numbered equation:
-\begin{equation}
-  \sum_{i=0}^{\infty}x_i=\int_{0}^{\pi+2} f
-\end{equation}
-just to demonstrate \LaTeX's able handling of numbering.
-
-%\section{Figures}
-
-%% Elena: this will be helpful to show eventually
-
-%The ``\verb|figure|'' environment should be used for figures. One or
-%more images can be placed within a figure. 
-
-%If your figure contains
-%third-party material, you must clearly identify it as such, as shown
-%in the example below.
-%\begin{figure}[h]
-%  \centering
-%  \includegraphics[width=\linewidth]{sample-franklin}
-%  \caption{1907 Franklin Model D roadster. Photograph by Harris \&
-%    Ewing, Inc. [Public domain], via Wikimedia
-%    Commons. (\url{https://goo.gl/VLCRBB}).}
-%  \Description{A woman and a girl in white dresses sit in an open car.}
-%\end{figure}
-
-\subsection{Figures}
-\label{sec:figures}
-
-Like tables, figures cannot be split across pages; the
-best placement for them
-is typically the top or the bottom of the page nearest
-their initial cite.  To ensure this proper ``floating'' placement
-of figures, use the environment
-\textbf{figure} to enclose the figure and its caption.
-
-This sample document contains examples of
-a \textbf{.pdf} file to be displayable with \LaTeX, such as
-Figure~\ref{fig:singleColumnFigure}.  More
-details on each of these is found in the \textit{Author's Guide}.
-
-\begin{figure}
-\centering
-\includegraphics[width=3in]{sample_graph.pdf}
-\caption{A sample graph just spanning one column.}
-\Description{Describe your image for visually impaired}
-\label{fig:singleColumnFigure}
-\end{figure}
-
-
-As was the case with tables, you may want a figure
-that spans two columns, like Figure~\ref{fig:twoColumnFigure}.  
-To do this, and still to
-ensure proper ``floating'' placement of tables, use the environment
-\texttt{figure*} to enclose the figure and its caption.
-And don't forget to end the environment with
-\texttt{figure*}, not \texttt{figure}!
-
-\begin{figure*}
-\centering
-\includegraphics[width=\textwidth]{sample_graph.pdf}
-\caption{A sample graph that needs to span two columns of text.}
-\Description{Describe your image for visually impaired}
-\label{fig:twoColumnFigure}
-\end{figure*}
-
-It's easiest and you tend to get the best quality if your figure uses vector graphics
-in PDF format. You can include other formats such as PNG, but they will usually
-not look nearly as professional, especially when printed on high resolution printers.
-\emph{Be very wary of screen captures from other papers. They tend to look pixelated
-and amateurish even at high resolutions.}
-
-\subsection{Tables}
-\label{sec:tables}
-
-Because tables cannot be split across pages, the best
-placement for them is typically the top of the page
-nearest their initial cite.  To
-ensure this proper ``floating'' placement of tables, use the
-environment \textbf{table} to enclose the table's contents and
-the table caption.  The contents of the table itself must go
-in the \textbf{tabular} environment, to
-be aligned properly in rows and columns, with the desired
-horizontal and vertical rules.  Again, detailed instructions
-on \textbf{tabular} material
-is found in the \textit{\LaTeX\ User's Guide}.
-
-Immediately following this sentence is the point at which
-Table~\ref{tab:frequencyOfSpecialChars} is included in the input file; 
-compare the placement of the table here with the table in the
-PDF output running \LaTeX\ on this document.
-
-\begin{table}[t]
-\centering
-\caption{Frequency of Special Characters}
-\label{tab:frequencyOfSpecialChars}
-\begin{tabular}{c|c|l}
-Non-English or Math & Frequency & Comments\\ \hline
-\O & 1 in 1,000 & For Swedish names\\
-$\pi$ & 1 in 5 & Common in math\\
-\$ & 4 in 5 & Used in business\\
-$\Psi^2_1$ & 1 in 40,000 & Unexplained usage\\
-\end{tabular}
-\end{table}
-
-To set a wider table, which takes up the whole width of
-the page's live area, use the environment
-\textbf{table*} to enclose the table's contents and
-the table caption, as demonstrated in Table~\ref{tab:typicalCommands} below.  
-As with a single-column table, this wide
-table will ``float" to a location deemed more desirable.
-Immediately following this sentence is the point at which
-Table~\ref{tab:typicalCommands} is included in the input file; again, it is
-instructive to compare the placement of the
-table here with the table in the printed dvi
-output of this document.
-
-
-\begin{table*}[t]
-\centering
-\caption{Some Typical Commands}
-\label{tab:typicalCommands}
-\begin{tabular}{ccl}
-Command & A Number & Comments \\ \hline
-\texttt{\textbackslash alignauthor}     & 100 & Author alignment\\
-\texttt{\textbackslash numberofauthors} & 200 & Author enumeration\\
-\texttt{\textbackslash table}           & 300 & For tables\\
-\texttt{\textbackslash table*}          & 400 & For wider tables\\ 
-\end{tabular}
-\end{table*}
-% end the environment with {table*}, NOTE not {table}!
-
-\subsection{Citations}
-\label{sec:citations}
-
-Citations to articles~\cite{Aaronson:2005,Garey:1979,Brun:2008} listed
-in the Bibliography section of your
-article will occur throughout the text of your article.
-You should use BibTeX to automatically produce this bibliography;
-you simply need to insert one of several citation commands with
-a key of the item cited in the proper location in
-the \texttt{.tex} file~\cite{OM:2008}.
-The key is a short reference you invent to uniquely
-identify each work; in this sample document, the key is
-the first author's surname and a
-word from the title.  This identifying key is included
-with each item in the \texttt{.bib} file for your article.
-
-It is recommended that you precede \texttt{\textbackslash cite} (and 
-\texttt{\textbackslash ref}) commands with a tilde
-character instead of a space, e.g., \texttt{some text\textasciitilde\textbackslash cite}. The tilde gives you a non-breaking space which ensures that your citation won't get
-stranded by itself on the beginning of a line.
-
-The details of the construction of the \texttt{.bib} file
-are beyond the scope of this sample document, but more
-information can be found in the \textit{Author's Guide},
-and exhaustive details in the \textit{\LaTeX\ User's
-Guide}.
-
-This article shows only the plainest form
-of the citation command, using \texttt{\textbackslash cite},
-which is all that is needed for our senior seminar.
-You shouldn't use any other forms here.
-
-
-
-\section{Citations and Bibliographies}
-\label{sec:bibliography}
-
-The use of BibTeX for the preparation and formatting of one's
-references is strongly recommended. Authors' names should be complete
---- use full first names (``Donald E. Knuth'') not initials
-(``D. E. Knuth'') --- and the salient identifying features of a
-reference should be included: title, year, volume, number, pages,
-article DOI, etc.
-
-The bibliography is included in your source document with these two
-commands, placed just before the \verb|\end{document}| command:
-\begin{verbatim}
-  \bibliographystyle{ACM-Reference-Format}
-  \bibliography{bibfile}
-\end{verbatim}
-where ``\verb|bibfile|'' is the name, without the ``\verb|.bib|''
-suffix, of the BibTeX file.
-
-Citations and references are numbered by default. A small number of
-ACM publications have citations and references formatted in the
-``author year'' style; for these exceptions, please include this
-command in the {\bfseries preamble} (before the command
-``\verb|\begin{document}|'') of your \LaTeX\ source:
-\begin{verbatim}
-  \citestyle{acmauthoryear}
-\end{verbatim}
+Conclusion - While it’s ideal to have one golden benchmarking set, that's hard (because of the reasons outlined above), so now we have specialized ones.
+Acknowledgments
 
 %% Elena: examples like this are actually helpful, but I can't locate theit bibliography 
 %% file (I think they are using a databse), so providing examples will have to wait.
@@ -537,10 +209,7 @@ command in the {\bfseries preamble} (before the command
 %% identification of the section in the article metadata, and the
 %% consistent spelling of the heading.
 \begin{acks}
-This is where you thank those who helped you better understand the material 
-and gave you helpful feedback on the paper, usually including your adviser. 
-This is not a place to thank your family, your significant other or your best friend, 
-or anyone else  for moral support or yummy cookies. 
+Thanks.
 \end{acks}
 
 %%
