@@ -64,20 +64,10 @@
 %% end of the preamble, start of the body of the document source.
 \begin{document}
 
-%%
-%% The "title" command has an optional parameter,
-%% allowing the author to define a "short title" to be used in page headers.
 \title{Optical Character Recognition}
-
-%%
-%% The "author" command and its associated commands are used to define
-%% the authors and their affiliations.
-%% Of note is the shared affiliation of the first two authors, and the
-%% "authornote" and "authornotemark" commands
-%% used to denote shared contribution to the research.
 \author{Orville "El" Anderson}
 \email{and10393@umn.edu}
-\affiliation{%
+\affiliation{
   \institution{Division of Science and Mathematics 
 	\\
         University of Minnesota, Morris
@@ -89,19 +79,11 @@
 }
 
 %%
-%% By default, the full list of authors will be used in the page
-%% headers. Often, this list is too long, and will overlap
-%% other information printed in the page headers. This command allows
-%% the author to define a more concise list
-%% of authors' names for this purpose.
-%\renewcommand{\shortauthors}{Trovato and Tobin, et al.}
-
-%%
 %% The abstract is a short summary of the work to be presented in the
 %% article.
 \begin{abstract}
 
-This paper looks at Optical Character Recognition(OCR) as a means to improve usability and accessibility of Scanned Documents. The focus is on how to compare OCR implementations, the weaknesses of OCR, and how we can create tests to specifically target those weaknesses.
+This paper looks at Optical Character Recognition(OCR) as a means to improve usability and accessibility of Scanned Documents. The focus is on how to compare OCR implementations, the weaknesses of OCR, and how to can create tests to specifically target those weaknesses.
 
 \end{abstract}
 
@@ -121,26 +103,32 @@ This paper looks at Optical Character Recognition(OCR) as a means to improve usa
 \section{Introduction}
 \label{sec:introduction}
 
-Scanned documents are images of physical documents typically made with a scanner or camera. These documents are widely used because they are easy to create and share. Scanned documents have some hidden disadvantages compared to [native online documents]. The most notable of these disadvantages are larger storage requirements, longer loading times, and the inability to search within the text.\footnote{also you can't use a screen reader on them} 
+Scanned documents are images of physical documents typically made with a scanner or camera. These documents are widely used because they are easy to create and share. Scanned documents have some hidden disadvantages compared to digital documents. Digitized documents have the advantage of being search-able and editable in a way that scanned documents are not.\footnote{Digital documents also have the advantage of increased accessibility and usability for blind and low-vision users.} 
 
-While manually processing(typyign up) doccuments is a valid way to digitize it, it does not scale well. This is why we have Optical Character Recognition(OCR), a technology specifically made to extract text from images.
+Digitizing these physical documents is generally time consuming. This is why we have Optical Character Recognition(OCR), a technology specifically made to extract text from images.
 
 \section{Background}
 \label{sec:background}
 
-OCR is made of three main steps (plus acquisition and output). \footnote{soemthign to note here is that the input for OCR is generally a .pdf, .jpg, ... and the output can be .html, .pdf, ...}
+Pages to Reference\cite{Raj:2022,Avyodri:2022,Thorat:2022}
+
+OCR begins with acquiring an image. It will depend on the model, but most OCR will take files in .pdf, .jpg, and .png formats. These files will then go through the three stages of OCR, then will be output in the format of choice. This again will vary depending on the model, but all OCR will return some variation of the text extracted from the page and a separate description of where each of the words were found on the page.
+
+One big factor in the accuracy of OCR is the quality of the initial image. Marks on the physical document, book spines, and low image resolution all add additional complexity to the process. 
 
 \subsection{Document Layout Analysis}
 \label{DLA}
 
-Document layout analysis, DLA, is a general pre-processing step. (Besides taking high quality scans to begin with), this step has the largest impact of accuracy. The purpose of this step is to identify what part of the image is text and what is not. This step exists to remove any visual noise generated when scanning(or handling) the physical document and is sometimes used to remove tables and images from the page. 
-
-Pre-processing (aka cleaning) a document is one of the most important steps to ensure accuracy. (along with just taking good scans...). here you remove page borders, and rotate the image if applicable. 
+Document layout analysis, DLA, is a general pre-processing step. The purpose of this step is to identify what part of the image is text and what is not. This step addresses some of the complexity introduced when the image was made. This step can crop any dark and can rotate the image as a whole. It exists to remove any visual noise generated when scanning(or handling) the physical document and is sometimes used to remove tables and images from the page. This step frequently includes converting the input image to a binary image, where each pixel is marked as a text or non-text pixel, to reduce computation costs.
 
 \subsection{Text Line Detection}
 \label{TLD}
 
-this step consists of breaking up blocks of text into lines of text, then into individual words, then letters.
+TLD builds off of how DLA rotates the image, by then rotating the individual lines to create a baseline for each line of text. 
+
+This step consists of breaking up blocks of text into lines of text, then into individual words, then letters.
+
+
 
 After the individual characters have been identified, we go through and look at each of the boxes we have drawn around the characters and mark which pixels we think are text and which are not.
 
@@ -160,16 +148,19 @@ One very common method for character recognition is to use a Deep Learning. (woo
 \subsection{Post-Processing}
 \label{sec:Post-Processing}
 
-Post-processing is an optional, but very common step for OCR. This is glorified spellcheck for the output. It generally improves accuracy, but will write over spellings from the source document(misspellings and unconventional spellings included.)
+Post-processing is an optional, but very common step for OCR, consisting of spellcheck and formatting. Running spellcheck on the output generally improves accuracy, but will write over spellings from the source document(misspellings and unconventional spellings included.) The additional formatting step is used to return the document to a human readable form. Some OCR will place the output directly over the input image, some will make webpages with the output and some will --.
 
-\subsection{Output}
-\label{sec:Output}
+\subsection{Comparison}
+\label{comparison}
 
-The output of OCR is given in many different ways. One of the more popular outputs is as the accuracy percentage.
+The main considerations when judging OCR models is accuracy and speed.\citep{Raj:2022} 
 
-The output of OCR is a text document
-\cite{Raj:2022,Avyodri:2022,Thorat:2022}
-\todo[inline]{Formula?}
+[Speed is measured with a timer]
+
+A popular way to measure the accuracy of OCR output is to run the OCR program on a document where the page content is know. The OCR output is then compared to the known content and is measured by [the formula below], where x is a unit of measurement, like a line, word, or character.
+\[
+\dfrac{\sum\limits_{i=1}^\text{num of pages}\text{number of x correctly indentified}}{\sum\limits_{i=1}^\text{num of pages}\text{number of x on the page}}
+\]
 
 \section{Challenges}
 \label{sec:body}
@@ -179,7 +170,7 @@ There are three main categories of things that make scanned documents harder to 
 \subsection{Layout}
 \label{sec:Layout}
 
-There exists many ways to format a paper. 
+[There exists many ways to format a paper.] 
 % Documents come in many different layouts. Things like images, figures, and number of columns add a layer of complexity to documents. Each layout needs to be accounted for when training OCR. 
 
 % There exists OCR specifically trained to handle documents like forms. For example a model can be trained to specifically digitize job applications for one company, or one specific tax form. By making a specialized  model, there is an increased accuracy when working with documents of that specific layout, but a decrease in accuracy for other layouts. 
@@ -191,9 +182,9 @@ There exists many ways to format a paper.
 
 % Variations in fonts and alphabets introduce an added layer of complexity that need to be accounted for when performing the character recognition step. 
 
-Most OCR are trained on the Latin Alphabet. These models are not automatically applicable to other alphabets. As this paper\cite{Fateh:2024} says about Arabic, "Finally, character and TLD approaches cannot be universally applied to scripts with different languages. This challenge is particularly pronounced in languages such as Persian and Arabic, where text characters can take the form of connectors or non-connectors. Connector letters are affixed to both pre- and post-letters to form words, and diacritic marks are commonly used in Arabic text—both of which can introduce complexity to TLD techniques." This inherently gives all other languages a bit of a disadvantage. Other alphabets also have nuances that make it harder to directly apply OCR to. A common example is Arabic. (there's dots) \cite{Fateh:2024, Hegghamer:2022}
+Most OCR are trained on the Latin Alphabet.\footnote{why?} Latin is a simple alphabet in terms of OCR due to its lack of connected letters\footnote{an English equivalent would be cursive fonts}, dots and diacritics\footnote{such as accent marks}. Connected characters, especially, require extra consideration when performing text line detection. Fateh et Al\citep{Fateh:2024} looks at TLD for Arabic text and found that increasing the size of the boxes drawn around each character increased OCR output accuracy(for the model(s) they tested) 
 
-A more universal example of this trait is cursive. 
+These models are not automatically applicable to other alphabets. As this paper\cite{Fateh:2024} says about Arabic, "Finally, character and TLD approaches cannot be universally applied to scripts with different languages. This challenge is particularly pronounced in languages such as Persian and Arabic, where text characters can take the form of connectors or non-connectors. Connector letters are affixed to both pre- and post-letters to form words, and diacritic marks are commonly used in Arabic text—both of which can introduce complexity to TLD techniques." This inherently gives all other languages a bit of a disadvantage. Other alphabets also have nuances that make it harder to directly apply OCR to. A common example is Arabic. (there's dots) \cite{Fateh:2024, Hegghamer:2022}
 
 \subsection{Visual Noise}
 \label{sec:Noise}
@@ -203,12 +194,12 @@ There’s so many ways to scan a document badly. \cite{Hegghamer:2022}
 \section{Results}
 \label{sec:Results}
 
-Results - some specialized datasets exist \cite{Fateh:2024,Hegghamer:2022}
+Results - some specialized data-sets exist \cite{Fateh:2024,Hegghamer:2022}
 
 \section{Conclusion}
 \label{sec:Conclusion}
 
-Conclusion - While it's ideal to have one golden benchmarking set, that's hard (because of the reasons outlined above), so now we have specialized ones.
+Conclusion - While it's ideal to have one golden bench-marking set, that's hard (because of the reasons outlined above), so now we have specialized ones.
 Acknowledgments
 
 %% Elena: examples like this are actually helpful, but I can't locate theit bibliography 
@@ -260,7 +251,6 @@ Thanks.
 %% the bibliography file.
 \bibliographystyle{ACM-Reference-Format}
 \bibliography{sample_paper}
-
 
 \end{document}
 \endinput
