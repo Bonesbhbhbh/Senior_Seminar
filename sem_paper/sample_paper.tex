@@ -64,8 +64,8 @@
 %% end of the preamble, start of the body of the document source.
 \begin{document}
 
-\title{Optical Character Recognition}
-\author{Orville "El" Anderson}
+\title{Challenges of Optical Character Recognition}
+\author{Orville ``El'' Anderson}
 \email{and10393@umn.edu}
 \affiliation{
   \institution{Division of Science and Mathematics 
@@ -82,9 +82,7 @@
 %% The abstract is a short summary of the work to be presented in the
 %% article.
 \begin{abstract}
-
-This paper looks at Optical Character Recognition(OCR) as a means to improve usability and accessibility of Scanned Documents. The focus is on how to compare OCR implementations, the weaknesses of OCR, and how to can create tests to specifically target those weaknesses.
-
+This paper is about Optical Character Recognition(OCR) on scanned documents. The focus is on how the technology works, the weaknesses in current OCR programs, and how we can start to address the identified weaknesses. This paper uses Tesseract, Amazon Textract, and Google Document AI as example models, and looks at English and Arabic documents specifically. 
 \end{abstract}
 
 \doclicenseThis
@@ -103,57 +101,56 @@ This paper looks at Optical Character Recognition(OCR) as a means to improve usa
 \section{Introduction}
 \label{sec:introduction}
 
-Scanned documents are images of physical documents typically made with a scanner or camera. These documents are widely used because they are easy to create and share. Scanned documents have some hidden disadvantages compared to digital documents. Digitized documents have the advantage of being search-able and editable in a way that scanned documents are not.\footnote{Digital documents also have the advantage of increased accessibility and usability for blind and low-vision users.} 
-
-Digitizing these physical documents is generally time consuming. This is why we have Optical Character Recognition(OCR), a technology specifically made to extract text from images.
+There is a wide variety of documents that have been photographed\footnote{passive voice...}. These images are popular because they are easy to create and share. These images are inferior to traditional digital documents in the sense that they [are not search-able] or editable without fundamentally changing the structure.\footnote{garbage} Optical Character Recognition is a [technology] made to extract text from images. This paper looks at how OCR works, specifically for scanned documents, and looks at some of the specific weaknesses in applying OCR to these documents.
 
 \section{Background}
 \label{sec:background}
 
+The first step in using OCR on a document is to acquire an image of the document. This can be done using a camera or a scanner. These images can be saved as a variety of formats, such as a .pdf, .jpg, or .png. This file is then input to an OCR model, such as Tesseract, Textract, or Document AI\footnote{Document AI can mean many things, even within the topic of OCR, here in this paper it specifically means the OCR model Google Document AI} where the model will go through the three stages of OCR. The model will then return the text identified in the document. There exists variations in models, where some will also output information about where in the image a character was found. The text identified and the optional [information] can be returned in a variety of formats, depending on the model.
+
 Pages to Reference\cite{Raj:2022,Avyodri:2022,Thorat:2022}
-
-OCR begins with acquiring an image. It will depend on the model, but most OCR will take files in .pdf, .jpg, and .png formats. These files will then go through the three stages of OCR, then will be output in the format of choice. This again will vary depending on the model, but all OCR will return some variation of the text extracted from the page and a separate description of where each of the words were found on the page.
-
-One big factor in the accuracy of OCR is the quality of the initial image. Marks on the physical document, book spines, and low image resolution all add additional complexity to the process. 
 
 \subsection{Document Layout Analysis}
 \label{DLA}
 
-Document layout analysis, DLA, is a general pre-processing step. The purpose of this step is to identify what part of the image is text and what is not. This step addresses some of the complexity introduced when the image was made. This step can crop any dark and can rotate the image as a whole. It exists to remove any visual noise generated when scanning(or handling) the physical document and is sometimes used to remove tables and images from the page. This step frequently includes converting the input image to a binary image, where each pixel is marked as a text or non-text pixel, to reduce computation costs.
+The first step in OCR is Document Layout Analysis(DLA), and is a general pre-processing step. The purpose is to identify what part of the image is text and what is not. 
+% This step addresses some of the complexity introduced when the image was made. This step can include rotating the full image and cropping out borders.
+This step frequently includes converting the input image to a binary image, where each pixel is marked as a text or non-text pixel, to reduce computation costs.
 
 \subsection{Text Line Detection}
 \label{TLD}
 
-TLD builds off of how DLA rotates the image, by then rotating the individual lines to create a baseline for each line of text. 
+Text Line Detection(TLD) is the second step in OCR. TLD takes the blocks of text from the previous step and further breaks them down into lines, words, and then characters. The output of this step is each identified character in its own defined box of pixels.
 
-This step consists of breaking up blocks of text into lines of text, then into individual words, then letters.
+% A common technique used in this step includes rotating the individual lines to create a baseline for each line of text. 
+% This step consists of breaking up blocks of text into lines of text, then into individual words, then letters.
 
+% After the individual characters have been identified, we go through and look at each of the boxes we have drawn around the characters and mark which pixels we think are text and which are not.
 
-
-After the individual characters have been identified, we go through and look at each of the boxes we have drawn around the characters and mark which pixels we think are text and which are not.
-
-\begin{figure}
-  \includegraphics[width=\linewidth]{TLD.png}
-  \caption{stages of TLD}
-  \label{fig:tld}
-\end{figure}
+%\begin{figure}
+%  \includegraphics[width=\linewidth]{TLD.png}
+%  \caption{stages of TLD}
+%  \label{fig:tld}
+%\end{figure}
 
 \subsection{Recognition}
 \label{Recognition}
 
-We then take the mega-cleaned characters and try to identify them. There are many ways to do this, but it boils down to matching your letter to a whole bunch of other letters and seeing which one is closest.
+The final step in the OCR process is referred to as Classification or Recognition. This step takes boxes of individual characters from the last step and tries to identify them. 
 
-One very common method for character recognition is to use a Deep Learning. (woo magic). The notable thing about this method is that it must be intentionally fed examples of text to train.
+Two common techniques to do this are comparing the unknown character to an existing set of images of characters and seeing which character overlaps with the unknown, and using features from the character to make an educated guess.\citep{Thorat:2022}
+%There are many ways to do this, but it boils down to matching your letter to a whole bunch of other letters and seeing which one is closest.
+%One very common method for character recognition is to use a Deep Learning. (woo magic). The notable thing about this method is that it must be intentionally fed examples of text to train.
 
-\subsection{Post-Processing}
-\label{sec:Post-Processing}
-
-Post-processing is an optional, but very common step for OCR, consisting of spellcheck and formatting. Running spellcheck on the output generally improves accuracy, but will write over spellings from the source document(misspellings and unconventional spellings included.) The additional formatting step is used to return the document to a human readable form. Some OCR will place the output directly over the input image, some will make webpages with the output and some will --.
+%\subsection{Post-Processing}
+%\label{sec:Post-Processing}
+%
+%Post-processing is an optional, but very common step for OCR, consisting of spellcheck and formatting. Running spellcheck on the output generally improves accuracy, but will write over spellings from the source document(misspellings and unconventional spellings included.) The additional formatting step is used to return the document to a human readable form. Some OCR will place the output directly over the input image, some will make webpages with the output and some will --.
 
 \subsection{Comparison}
 \label{comparison}
 
-The main considerations when judging OCR models is accuracy and speed.\citep{Raj:2022} 
+The main considerations when judging OCR models are accuracy and speed.\cite{Raj:2022} 
 
 [Speed is measured with a timer]
 
@@ -161,6 +158,8 @@ A popular way to measure the accuracy of OCR output is to run the OCR program on
 \[
 \dfrac{\sum\limits_{i=1}^\text{num of pages}\text{number of x correctly indentified}}{\sum\limits_{i=1}^\text{num of pages}\text{number of x on the page}}
 \]
+
+% \cite{Hegghamer:2022} this paper makes a destinction between word accuracy and character accuracy saying that "----"
 
 \section{Challenges}
 \label{sec:body}
@@ -189,7 +188,8 @@ These models are not automatically applicable to other alphabets. As this paper\
 \subsection{Visual Noise}
 \label{sec:Noise}
 
-There’s so many ways to scan a document badly. \cite{Hegghamer:2022}
+There's so many ways to scan a document badly. \cite{Hegghamer:2022}
+One big factor in the accuracy of OCR is the quality of the initial image. Marks on the physical document, book spines, and low image resolution all add additional complexity to the process. 
 
 \section{Results}
 \label{sec:Results}
