@@ -106,7 +106,8 @@ There is a wide variety of documents that have been photographed\footnote{passiv
 \section{Background}
 \label{sec:background}
 
-The first step in using OCR on a document is to acquire an image of the document. This can be done using a camera or a scanner. These images can be saved as a variety of formats, such as a .pdf, .jpg, or .png. This file is then input to an OCR model, such as Tesseract, Textract, or Document AI\footnote{Document AI can mean many things, even within the topic of OCR, here in this paper it specifically means the OCR model Google Document AI} where the model will go through the three stages of OCR. The model will then return the text identified in the document. There exists variations in models, where some will also output information about where in the image a character was found. The text identified and the optional [information] can be returned in a variety of formats, depending on the model.
+The first step in using OCR on a document is to acquire an image of the document. This can be done using a camera or a scanner. These images can be saved as a variety of formats, such as a .pdf, .jpg, or .png. This file is then input to an OCR model, such as Tesseract, Textract, or Document AI\footnote{Document AI can mean many things, even within the topic of OCR, here in this paper it specifically means the OCR model Google Document AI} where the model will go through the three stages of OCR. The model will then return the text identified in the document as plain text.\footnote{There are some models which also return information about where they found each character and with this they can output the text in a variety of formats.} 
+%There exists variations in models, where some will also output information about where in the image a character was found. The text identified and the optional [information] can be returned in a variety of formats, depending on the model.
 
 Pages to Reference\cite{Raj:2022,Avyodri:2022,Thorat:2022}
 
@@ -136,9 +137,9 @@ Text Line Detection(TLD) is the second step in OCR. TLD takes the blocks of text
 \subsection{Recognition}
 \label{Recognition}
 
-The final step in the OCR process is referred to as Classification or Recognition. This step takes boxes of individual characters from the last step and tries to identify them. 
+The final step in the OCR process is referred to as Classification or Recognition. This step takes the boxes of individual characters from the last step and tries to identify the character inside of them.
 
-Two common techniques to do this are comparing the unknown character to an existing set of images of characters and seeing which character overlaps with the unknown, and using features from the character to make an educated guess.\citep{Thorat:2022}
+One common technique is to compare the unknown character to a set of known characters, overlaying them, and seeing which ones are the most similar. Another technique is to identify features from the character to make an educated guess.\citep{Thorat:2022}\footnote{Objection, how is this relevant?? Wouldn't it be more important to talk about training for recognition?}
 %There are many ways to do this, but it boils down to matching your letter to a whole bunch of other letters and seeing which one is closest.
 %One very common method for character recognition is to use a Deep Learning. (woo magic). The notable thing about this method is that it must be intentionally fed examples of text to train.
 
@@ -152,7 +153,7 @@ Two common techniques to do this are comparing the unknown character to an exist
 
 The main considerations when judging OCR models are accuracy and speed.\cite{Raj:2022} 
 
-[Speed is measured with a timer]
+%[Speed is measured with a timer]
 
 A popular way to measure the accuracy of OCR output is to run the OCR program on a document where the page content is know. The OCR output is then compared to the known content and is measured by [the formula below], where x is a unit of measurement, like a line, word, or character.
 \[
@@ -181,26 +182,35 @@ There are three main categories of things that make scanned documents harder to 
 
 % Variations in fonts and alphabets introduce an added layer of complexity that need to be accounted for when performing the character recognition step. 
 
-Most OCR are trained on the Latin Alphabet.\footnote{why?} Latin is a simple alphabet in terms of OCR due to its lack of connected letters\footnote{an English equivalent would be cursive fonts}, dots and diacritics\footnote{such as accent marks}. Connected characters, especially, require extra consideration when performing text line detection. Fateh et Al\citep{Fateh:2024} looks at TLD for Arabic text and found that increasing the size of the boxes drawn around each character increased OCR output accuracy(for the model(s) they tested) 
+The Latin alphabet has about 25 letters, each with a lowercase and uppercase variant, is written left-to-right and is primarily non-cursive. OCR is so accurate when applied to [Latin-alphabet texts] because of the simplicity of the alphabet and because they are generally trained on English text. \footnote{you wanna cite this?}
 
-These models are not automatically applicable to other alphabets. As this paper\cite{Fateh:2024} says about Arabic, "Finally, character and TLD approaches cannot be universally applied to scripts with different languages. This challenge is particularly pronounced in languages such as Persian and Arabic, where text characters can take the form of connectors or non-connectors. Connector letters are affixed to both pre- and post-letters to form words, and diacritic marks are commonly used in Arabic text—both of which can introduce complexity to TLD techniques." This inherently gives all other languages a bit of a disadvantage. Other alphabets also have nuances that make it harder to directly apply OCR to. A common example is Arabic. (there's dots) \cite{Fateh:2024, Hegghamer:2022}
+This training does not automatically transfer to other alphabets. % In many cases, such as the Cirrilic "", it adds confusion, where the character is mis-classififed as the Latin "H".
+
+Arabic, in comparison to Latin is a significantly more complex alphabet. The alphabet consists of 28 characters, uses contextual forms, and is unicase. Arabic is cursive, where each character is connected. The alphabet is written right to left. The final bit of complexity to note about this alphabet, is the use of diacritics, dots and marks, which can appear above or below the main text and influence the meaning.
+
+% These models are not automatically applicable to other alphabets. As this paper\cite{Fateh:2024} says about Arabic, "Finally, character and TLD approaches cannot be universally applied to scripts with different languages. This challenge is particularly pronounced in languages such as Persian and Arabic, where text characters can take the form of connectors or non-connectors. Connector letters are affixed to both pre- and post-letters to form words, and diacritic marks are commonly used in Arabic text—both of which can introduce complexity to TLD techniques." This inherently gives all other languages a bit of a disadvantage. Other alphabets also have nuances that make it harder to directly apply OCR to. A common example is Arabic. (there's dots) \cite{Fateh:2024, Hegghamer:2022}
+
+This weakness in OCR models is most easily seen in non-Latin language documents, but can also be seen when using these models on documents with a variety of fonts, or documents with handwritten text. 
 
 \subsection{Visual Noise}
 \label{sec:Noise}
 
-There's so many ways to scan a document badly. \cite{Hegghamer:2022}
+% There's so many ways to scan a document badly. \cite{Hegghamer:2022}
 One big factor in the accuracy of OCR is the quality of the initial image. Marks on the physical document, book spines, and low image resolution all add additional complexity to the process. 
 
 \section{Results}
 \label{sec:Results}
 
-Results - some specialized data-sets exist \cite{Fateh:2024,Hegghamer:2022}
+To evaluate accuracy and compare OCR models we use bench-marking datasets, collections of images where the expected output is known. Because of the inherit variety of documents needed to target these issues there is not really a reasonable way to make one. Some specialized data-sets exist \cite{Fateh:2024,Hegghamer:2022}
+
+Fateh et Al\citep{Fateh:2024} looks at TLD for Arabic text and found that increasing the size of the boxes drawn around each character increased OCR output accuracy(for the model(s) they tested)
 
 \section{Conclusion}
 \label{sec:Conclusion}
 
-Conclusion - While it's ideal to have one golden bench-marking set, that's hard (because of the reasons outlined above), so now we have specialized ones.
-Acknowledgments
+While it's ideal to have one golden bench-marking set, that's hard (because of the reasons outlined above), so now we have specialized ones. 
+Honestly I don't have a full stance on if I think these specialized sets are good. Yes, they highlight weaknesses of general OCR models, and push the development of OCR further, but blind acceptance and promotion of them can neglect some of the specialties of OCR, like layout-specific models. Data sets also don't really encourage reducing time and resource complexity for models, which I would like to see.
+I am interested in this topic of OCR because of the role I think it could play in digital accessibility, but for that we would need to push for more free models with graphic user interfaces.\footnote{for context, Document AI and Textract are both paid models, and Tesseract only has 3rd party GUIs} 
 
 %% Elena: examples like this are actually helpful, but I can't locate theit bibliography 
 %% file (I think they are using a database), so providing examples will have to wait.
