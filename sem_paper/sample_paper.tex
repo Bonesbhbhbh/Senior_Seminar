@@ -101,38 +101,44 @@ Optical Character Recognition (OCR) is technology used to extract text from imag
 \section{Introduction}
 \label{sec:introduction}
 
-There is a wide variety of documents that have been photographed\footnote{passive voice...}. These images are popular because they are easy to create and share. These images are inferior to traditional digital documents in the sense that they [are not search-able] or editable without fundamentally changing the structure.\footnote{garbage} Optical Character Recognition is a [technology] made to extract text from images. This paper looks at how OCR works, specifically for scanned documents, and looks at some of the specific weaknesses in applying OCR to these documents.
+Over time, American Institutions, have accumulated a ginormous amount of scanned documents.
+In April of 2024, the Department of Justice, updated the Americans with Disabilities Act to include access to digital content such as scanned documents. Among other things, all scanned documents made publicly accessible by state and local governments must now be usable by a screen reader. When a document is scanned, it becomes an image and looses all information about the text present. The first step to  make a scanned document screen-readable is to recognize the text lost when the document was scanned. This process can be done manually, but that isn't well suited for large numbers of documents. Instead we look to Optical Character Recognition (OCR), a technology made to extract text from images. 
+\todo[inline]{the first step is to consider if the page is necessary, the second is to try to find the source document}
+%academics have acumlated a wide There is a wide variety of documents that have been photographed\footnote{passive voice...}. 
+%are popular because they are easy to create and share. These images are inferior to traditional digital documents in the sense that they [are not search-able] or editable without fundamentally changing the structure.\footnote{garbage} Optical Character Recognition is a [technology] made to extract text from images. 
+This paper looks at how OCR works, specifically for scanned documents, and looks at some of the specific weaknesses in applying OCR in the context of Public Universities.
 
 \section{Background}
 \label{sec:background}
 
-The first step in using OCR on a document is to acquire an image of the document. This can be done using a camera or a scanner. These images can be saved as a variety of formats, such as a .pdf, .jpg, or .png. This file is then input to an OCR model, such as Tesseract, Textract, or Document AI\footnote{Document AI can mean many things, even within the topic of OCR, here in this paper it specifically means the OCR model Google Document AI} where the model will go through the three stages of OCR. The model will then return the text identified in the document as plain text.\footnote{There are some models which also return information about where they found each character and with this they can output the text in a variety of formats.} 
-%There exists variations in models, where some will also output information about where in the image a character was found. The text identified and the optional [information] can be returned in a variety of formats, depending on the model.
+The process of OCR starts with an existing scanned document. These documents can come in many file types, some common ones are .tiff, .pdf, and .jpg.
+% The first step in using OCR on a document is to acquire an image of the document. This can be done using a camera or a scanner. These images can be saved as a variety of formats, such as a .pdf, .jpg, or .png. 
+This file is then input to an OCR model, such as Tesseract, Amazon's Textract, or Google's Document AI, where the model will go through the three stages of OCR. The model will then return the text identified in the document as plain text, sometimes with meta-information. \footnote{Modern OCR models can return use this information to make differnt output formats, but they all use the text and meta-information to do that.}
 
-Pages to Reference\cite{Raj:2022,Avyodri:2022,Thorat:2022}
+Pages to Reference\cite{Avyodri:2022,Thorat:2022}
 
 \subsection{Document Layout Analysis}
 \label{DLA}
 
-The first step in OCR is Document Layout Analysis (DLA), and is a general pre-processing step. The purpose is to identify what part of the image is text and what is not. 
+The first step in OCR is Document Layout Analysis (DLA), and is a general pre-processing step. The purpose is to identify what part of the image is text and what is not. This effectively draws a box around each paragraph and table on the page.
 % This step addresses some of the complexity introduced when the image was made. This step can include rotating the full image and cropping out borders.
-This step frequently includes converting the input image to a binary image, where each pixel is marked as a text or non-text pixel, to reduce computation costs.
+This step frequently outputs the result as a binary image, where each pixel is marked as a text or non-text pixel, to reduce computation costs.
 
 \subsection{Text Line Detection}
 \label{TLD}
 
-Text Line Detection (TLD) is the second step in OCR. TLD takes the blocks of text from the previous step and further breaks them down into lines, words, and then characters. The output of this step is each identified character in its own defined box of pixels.
+Text Line Detection (TLD) is the second step in OCR. TLD takes the blocks of text from the previous step and further breaks them down, into lines, words, and then individual characters. The output of this step is each identified character in its own defined box of pixels.
 
-% A common technique used in this step includes rotating the individual lines to create a baseline for each line of text. 
-% This step consists of breaking up blocks of text into lines of text, then into individual words, then letters.
+A common technique used in this step includes rotating the individual lines of text to create a baseline, so counter any rotated text. This extra action improves the accuracy of identified characters. 
+Two methods employed by Fateh et al\citep{Fateh:2024} used font size and correcting line rotation, to improve overall accuracy.
 
 % After the individual characters have been identified, we go through and look at each of the boxes we have drawn around the characters and mark which pixels we think are text and which are not.
 
-%\begin{figure}
-%  \includegraphics[width=\linewidth]{TLD.png}
-%  \caption{stages of TLD}
-%  \label{fig:tld}
-%\end{figure}
+\begin{figure}
+  \includegraphics[width=\linewidth]{stages.png}
+  \caption{stages of OCR}
+  \label{fig:tld}
+\end{figure}
 
 \subsection{Recognition}
 \label{Recognition}
@@ -151,7 +157,7 @@ One common technique is to compare the unknown character to a set of known chara
 \subsection{Comparison}
 \label{comparison}
 
-The main considerations when judging OCR models are accuracy and speed.\cite{Raj:2022} 
+The main considerations when judging OCR models are accuracy and speed.\cite{Avyodri:2022} 
 
 %[Speed is measured with a timer]
 
