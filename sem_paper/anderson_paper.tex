@@ -82,7 +82,7 @@
 %% The abstract is a short summary of the work to be presented in the
 %% article.
 \begin{abstract}
-Optical Character Recognition (OCR) is technology used to extract text from images. OCR has three main weaknesses when applied to scanned documents stemming from page layouts, the alphabet used, and visual noise. By intentionally expanding the documents we use to train modern OCR models, we can increase [usability] of this technology. This paper looks at the Tesseract, Amazon Textract, and Google Document AI models, as applied to English and Arabic documents.
+Optical Character Recognition (OCR) is technology used to extract text from images. OCR has three main weaknesses when applied to scanned documents stemming from page layouts, the alphabet used, and visual noise. By intentionally expanding the documents we use to train modern OCR models, we can increase the accuracy of this technology. This paper looks at the Tesseract, Amazon Textract, and Google Document AI models, as applied to English and Arabic documents.
 \end{abstract}
 
 \doclicenseThis
@@ -110,7 +110,6 @@ This paper looks at how OCR works, specifically for scanned documents, and looks
 
 \section{Background}
 \label{sec:background}
-
 The process of OCR starts with an existing scanned document. These documents can come in many file types, some common ones are .tiff, .pdf, and .jpg.
 % The first step in using OCR on a document is to acquire an image of the document. This can be done using a camera or a scanner. These images can be saved as a variety of formats, such as a .pdf, .jpg, or .png. 
 This file is then input to an OCR model, such as Tesseract, Amazon's Textract, or Google's Document AI, where the model will go through the three stages of OCR. The model will then return the text identified in the document as plain text, sometimes with meta-information. \footnote{Modern OCR models can return use this information to make differnt output formats, but they all use the text and meta-information to do that.}
@@ -119,14 +118,14 @@ Pages to Reference\cite{Avyodri:2022,Thorat:2022}
 
 \subsection{Document Layout Analysis}
 \label{DLA}
-
 The first step in OCR is Document Layout Analysis (DLA), and is a general pre-processing step. The purpose is to identify what part of the image is text and what is not. This effectively draws a box around each paragraph and table on the page.
 % This step addresses some of the complexity introduced when the image was made. This step can include rotating the full image and cropping out borders.
 This step frequently outputs the result as a binary image, where each pixel is marked as a text or non-text pixel, to reduce computation costs.
 
+An important step of DLA is preserving the reading order of the document. Without this step, OCR models are effectively limited to simple single-column text inputs.
+
 \subsection{Text Line Detection}
 \label{TLD}
-
 Text Line Detection (TLD) is the second step in OCR. TLD takes the blocks of text from the previous step and further breaks them down, into lines, words, and then individual characters. The output of this step is each identified character in its own defined box of pixels.
 
 A common technique used in this step includes rotating the individual lines of text to create a baseline, so counter any rotated text. This extra action improves the accuracy of identified characters. 
@@ -142,42 +141,40 @@ Two methods employed by Fateh et al\citep{Fateh:2024} used font size and correct
 
 \subsection{Recognition}
 \label{Recognition}
-
 The final step in the OCR process is referred to as Classification or Recognition. This step takes the boxes of individual characters from the last step and tries to identify the character inside of them.
 
-One common technique is to compare the unknown character to a set of known characters, overlaying them, and seeing which ones are the most similar. Another technique is to identify features from the character to make an educated guess.\citep{Thorat:2022}\footnote{Objection, how is this relevant?? Wouldn't it be more important to talk about training for recognition?}
-%There are many ways to do this, but it boils down to matching your letter to a whole bunch of other letters and seeing which one is closest.
-%One very common method for character recognition is to use a Deep Learning. (woo magic). The notable thing about this method is that it must be intentionally fed examples of text to train.
+% [One key thing to understand is that] An OCR model is only able to classify a character as something it has seen before.  
+
+One common technique to identify an unknown character uses a process known as matrix matching. In this process, the unknown character is compared to an existing collection of known characters, and the character with the most similarity is chosen. There are a lot of variations in classification techniques, but the key thing to note here is that all methods use some sort of reference material as a basis to classify characters. The output of this step is inherently limited to characters the model has been trained on.
+% There are variations in classification techniques, including a subsection of OCR called Intelligent Character Recognition which uses machine learning, but all methods use some sort of training or reference material to classify.
 
 %\subsection{Post-Processing}
 %\label{sec:Post-Processing}
 %
 %Post-processing is an optional, but very common step for OCR, consisting of spellcheck and formatting. Running spellcheck on the output generally improves accuracy, but will write over spellings from the source document(misspellings and unconventional spellings included.) The additional formatting step is used to return the document to a human readable form. Some OCR will place the output directly over the input image, some will make webpages with the output and some will --.
 
-\subsection{Comparison}
-\label{comparison}
-
-The main considerations when judging OCR models are accuracy and speed.\cite{Avyodri:2022} 
-
-%[Speed is measured with a timer]
-
-A popular way to measure the accuracy of OCR output is to run the OCR program on a document where the page content is know. The OCR output is then compared to the known content and is measured by [the formula below], where x is a unit of measurement, like a line, word, or character.
-\[
-\dfrac{\sum\limits_{i=1}^\text{num of pages}\text{number of x correctly indentified}}{\sum\limits_{i=1}^\text{num of pages}\text{number of x on the page}}
-\]
-
-% \cite{Hegghamer:2022} this paper makes a destinction between word accuracy and character accuracy saying that "----"
+%\subsection{Comparison}
+%\label{comparison}
+%
+%The main considerations when judging OCR models are accuracy and speed.\cite{Avyodri:2022} 
+%
+%%[Speed is measured with a timer]
+%
+%A popular way to measure the accuracy of OCR output is to run the OCR program on a document where the page content is know. The OCR output is then compared to the known content and is measured by [the formula below], where x is a unit of measurement, like a line, word, or character.
+%\[
+%\dfrac{\sum\limits_{i=1}^\text{num of pages}\text{number of x correctly indentified}}{\sum\limits_{i=1}^\text{num of pages}\text{number of x on the page}}
+%\]
+%
+%% \cite{Hegghamer:2022} this paper makes a destinction between word accuracy and character accuracy saying that "----"
 
 \section{Challenges}
 \label{sec:body}
-
-There are three main categories of things that make scanned documents harder to digitize. Each of these challenges tie back to the key concept that OCR models work best when applied to what they were made to recognize.
+There are three main categories of things that decrease accuracy in the OCR process. Each of these challenges tie back to the key concept that OCR models work best when applied to what they were made to recognize.
 
 \subsection{Layout}
 \label{Layout}
-
-Documents come in many different layouts. Things like images, figures, and number of columns add a layer of complexity to documents. 
-In the Document Layout Analysis step of OCR the model must know which parts of the page to ignore, but also to know what order the sections of text should go in.
+Documents come in many different layouts. Things like images, figures, and number of columns add a layer of complexity to documents. In the Document Layout Analysis step and when the model outputs the final result, to be accurate, the model must have some method to understand the reading order. 
+% In the Document Layout Analysis step of OCR the model must know which parts of the page to ignore, but also to know what order the sections of text should go in.
 A paper formatted with two columns, such as this, is meant to be read left column, then right column. Unless otherwise instructed, an OCR model will take the first line from each column and treat them as one line. 
 % While understanding paragraph breaks and readign order is generally intuitive, this is something that must be intentionally taken into account when training OCR.
 
@@ -185,49 +182,60 @@ There exists OCR specifically trained to handle documents like forms. For exampl
 
 One related challenge to OCR accuracy is curved lines of text. The DLA and TLD stages of OCR\footnote{don't you dare use another acronym in this paragraph} use rectangles to section off portions of text and do not automatically rotates lines/words/characters to be [horizontal?]. Identifying a character when it is rotated is less likely to be accurate then if the character was horizontal. \citep{Fateh:2024}
 
+\subsection{Visual Noise}
+\label{Noise}
+
+% There's so many ways to scan a document badly. \cite{Hegghamer:2022}
+One big factor in the accuracy of OCR is the quality of the initial image. Marks on the physical document, book spines, and low image resolution all add additional complexity to the process. Marks on the page can both obscure letters, and can also be recognized as letters.
+
+\begin{figure}
+  \includegraphics[width=\linewidth]{noise.png}
+  \caption{Examples of visual noise from Hegghamer:2022, Salt and Pepper, Watermark, Scribbles, and Ink Stains}
+  \label{noise:visual}
+\end{figure}
+
 \subsection{Alphabet}
 \label{Alphabet}
+The most commonly used writing systems, by users, are the Latin alphabet, Chinese characters, then the Arabic alphabet.\cite{Vaughan:2025} \footnote{Arabic is actually an abjad, not a "true alphabet" because of how it treats vowels.}
+The majority of OCR models are trained to recognize characters from the Latin alphabet.
+As mentioned in section 2.4 Comparison, OCR models are limited in what they can recognize, to the characters they were trained on.
+The ability to recognize a Latin character, does not automatically extend to characters from other alphabets. While in the context of American universities, most but not all documents are in English. Some of the features discussed in this section are also applicable to English. Improving recognition of connected characters can help with handwritten documents and recognizing various fonts. This weakness in OCR models is most easily seen in non-Latin language documents, but can also be seen when using these models on documents with a variety of fonts, or documents with handwritten text.
 
-The English alphabet consists of 26 letters, each with a lowercase and uppercase variant. English is written left-to-right and is primarily non-cursive.
-Arabic, in comparison is unicase, uses contextual forms, is written right-to-left, and is cursive. Arabic also uses diacritics, dots and marks, which can appear above or below the main text and influence the meaning.
+The best alphabet to highlight this weakness is Arabic.
+The Arabic alphabet has two main features, that are not common in the Latin alphabet, which impact the OCR process. The first is the use of connected characters, the second is the use of diacritics. 
 
-These two languages are important when discussing OCR, both because of their popularity, but also because of how different they are. As this paper\cite{Fateh:2024} says about Arabic, "Finally, character and TLD approaches cannot be universally applied to scripts with different languages. This challenge is particularly pronounced in languages such as Persian and Arabic, where text characters can take the form of connectors or non-connectors. Connector letters are affixed to both pre- and post-letters to form words, and diacritic marks are commonly used in Arabic text—both of which can introduce complexity to TLD techniques." This paper explored the effects of changing the size of boxes when isolating characters in Arabic documents. They found that by increasing the size of the boxes, they had a higher accuracy. 
+During the Text Line Detection step, to better account for connected characters, the boxes drawn around each character must be larger. Curved text becomes a larger problem when using a larger box around characters.\citep{Fateh:2024}
+Diacritics are marks that are added around the character.\footnote{Accents are an example of a diacritic.} In written Arabic, diacritics are especially important because there are no vowels. These diacritics can be mistaken for visual noise.
 
-\todo[inline]{I introduce a lot of concepts here (like reading direction) that I don't do anything with. I need to touch on them, or remove them}
+% As this paper\cite{Fateh:2024} says about Arabic, "Finally, character and TLD approaches cannot be universally applied to scripts with different languages. This challenge is particularly pronounced in languages such as Persian and Arabic, where text characters can take the form of connectors or non-connectors. Connector letters are affixed to both pre- and post-letters to form words, and diacritic marks are commonly used in Arabic text—both of which can introduce complexity to TLD techniques." This paper explored the effects of changing the size of boxes when isolating characters in Arabic documents. They found that by increasing the size of the boxes, they had a higher accuracy. 
 
 % Variations in fonts and alphabets introduce an added layer of complexity that need to be accounted for when performing the character recognition step. 
 % In many cases, such as the Cirrilic "", it adds confusion, where the character is mis-classififed as the Latin "H".
 % These models are not automatically applicable to other alphabets.  This inherently gives all other languages a bit of a disadvantage. Other alphabets also have nuances that make it harder to directly apply OCR to. A common example is Arabic. (there's dots) \cite{Fateh:2024, Hegghamer:2022}
 
-This weakness in OCR models is most easily seen in non-Latin language documents, but can also be seen when using these models on documents with a variety of fonts, or documents with handwritten text. 
-
-\subsection{Visual Noise}
-\label{Noise}
-
-% There's so many ways to scan a document badly. \cite{Hegghamer:2022}
-One big factor in the accuracy of OCR is the quality of the initial image. Marks on the physical document, book spines, and low image resolution all add additional complexity to the process. 
-
-
+\begin{figure}
+  \includegraphics[width=\linewidth]{arabic.png}
+  \caption{Example of Arabic text, The heading of the Latin Alphabet Wikipedia page}
+  \label{arabic:alphabet}
+\end{figure}
 
 \section{Results}
 \label{sec:Results}
+In an effort to better understand the impact of visual noise and the Arabic alphabet on popular OCR models Thomas Hegghamer performed a bench-marking experiment. Hegghamer made a dataset of English and Arabic documents with artificial visual noise applied and used Tesseract, Amazon Textract, and Google Document AI on them. [He found ---]. While this doesn't directly work to address these challenges, it highlights them and provides resources, the dataset and his noise generator, which can be used to train future models. While not an exhaustive list of possible noise types, they represent several of the most common ones found in historical document scans."\citep{Hegghamer:2022} Hegghamer's "Noisy OCR Dataset", consists of 422 original documents with 43 variations of each, for a total of 18,568 documents.
 
-To evaluate accuracy and compare OCR models we use bench-marking datasets, collections of images where the expected output is known. Because of the inherit variety of documents needed to target these issues there is not really a reasonable way to make one. Some specialized data-sets exist \cite{Fateh:2024,Hegghamer:2022}
+% To evaluate accuracy and compare OCR models we use bench-marking datasets, collections of images where the expected output is known. Because of the inherit variety of documents needed to target these issues there is not really a reasonable way to make one. Some specialized data-sets exist \cite{Fateh:2024,Hegghamer:2022}
 
 Fateh et Al\citep{Fateh:2024} looks at TLD for Arabic text and found that increasing the size of the boxes drawn around each character increased OCR output accuracy(for the model(s) they tested)
 
-Thomas Hegghamer created an English and Arabic dataset specifically to test OCR accuracy of documents with artificial noise applied. "functions to generate six ideal types of image noise: “blur,” “weak ink,” “salt and pepper,” “watermark,” “scribbles,” and “ink stains” (see Fig. 2c-h). While not an exhaustive list of possible noise types, they represent several of the most common ones found in historical document scans."\citep{Hegghamer:2022} Hegghamer's "Noisy OCR Dataset", consists of 422 original documents with 43 variations of each, for a total of 18,568 documents.
+Some OCR models, notably Tesseract, have adapted to use machine learning to recognize text. Machine learning, in this case, works like matrix matching\ref{Recognition}, with the advantage that the existing collection of known characters is updated as the model is used on more documents. This method is better suited to recognize a variety of fonts and alphabets, but is still limited in some capacity by it's exposure to documents. Tesseract has also removed the Text Line Detection Step, instead of identifying text by individual characters, it uses full lines of text. \todo[inline]{what impact does going by full lines have?}
 
 \section{Conclusion}
 \label{Conclusion}
+To compare and evaluate the accuracy of OCR models, the models must be run on the same collection of documents, a dataset. If the goal of the model is to better handle the challenges identified in this paper, the dataset should include as many edge cases as possible. Due to the nature of layout and visual noise, it is inherently impossible to cover all scenarios. [covering all alphabets is still unrealistic at this point, but it is much more feasible than layout and noise]. 
 
-If the end goal of Optical Character Recognition for documents is to make one model that can be used on all documents to ever exist, it makes sense to have an all-encompassing weakness-addressing data set. As it stands, that data set can not exist. Ignoring the obvious storage and resource considerations, for the reasons outlined in this paper, we can not begin to comprehend the number of variations in documents, let alone truly test for them all. 
-
-A universal data set would not be widely accepted because it would actively go against many popular forms of OCR, specialized layout OCR models. While not generally applicable, due to their specialized nature, these models have a place in OCR conversations.
+Serious consideration to storage constraints need to be had when making these data sets. The Hegghamer dataset, NOD, is about 15BG of data when compressed, and -- when uncompressed. Hegghamer recognizes in his paper that there is limited variation in the layouts of the Arabic documents he included.
 
 All that said, I think that ideal data set is worth perusing. Progress towards a goal we may never meet is still progress. By pushing the bounds of what OCR models can do, we can strengthen their current capabilities.
-
-\todo[inline]{dataset or data set?}
 
 %* Its a nice idea to make one data set to address all of these issues
 %* That's impossible tho
@@ -238,40 +246,6 @@ All that said, I think that ideal data set is worth perusing. Progress towards a
 %While it's ideal to have one golden bench-marking set, that's hard (because of the reasons outlined above), so now we have specialized ones. 
 %Honestly I don't have a full stance on if I think these specialized sets are good. Yes, they highlight weaknesses of general OCR models, and push the development of OCR further, but blind acceptance and promotion of them can neglect some of the specialties of OCR, like layout-specific models. Data sets also don't really encourage reducing time and resource complexity for models, which I would like to see.
 %I am interested in this topic of OCR because of the role I think it could play in digital accessibility, but for that we would need to push for more free models with graphic user interfaces.\footnote{for context, Document AI and Textract are both paid models, and Tesseract only has 3rd party GUIs} 
-
-%% Elena: examples like this are actually helpful, but I can't locate theit bibliography 
-%% file (I think they are using a database), so providing examples will have to wait.
-
-%  Some examples.  A paginated journal article \cite{Abril07}, an
-%  enumerated journal article \cite{Cohen07}, a reference to an entire
-%  issue \cite{JCohen96}, a monograph (whole book) \cite{Kosiur01}, a
-%  monograph/whole book in a series (see 2a in spec. document)
-%  \cite{Harel79}, a divisible-book such as an anthology or compilation
-%  \cite{Editor00} followed by the same example, however we only output
-%  the series if the volume number is given \cite{Editor00a} (so
-%  Editor00a's series should NOT be present since it has no vol. no.),
-%  a chapter in a divisible book \cite{Spector90}, a chapter in a
-%  divisible book in a series \cite{Douglass98}, a multi-volume work as
-%  book \cite{Knuth97}, a couple of articles in a proceedings (of a
-%  conference, symposium, workshop for example) (paginated proceedings
-%  article) \cite{Andler79, Hagerup1993}, a proceedings article with
-%  all possible elements \cite{Smith10}, an example of an enumerated
-%  proceedings article \cite{VanGundy07}, an informally published work
-%  \cite{Harel78}, a couple of preprints \cite{Bornmann2019,
-%    AnzarootPBM14}, a doctoral dissertation \cite{Clarkson85}, a
-%  master's thesis: \cite{anisi03}, an online document / world wide web
-%  resource \cite{Thornburg01, Ablamowicz07, Poker06}, a video game
-%  (Case 1) \cite{Obama08} and (Case 2) \cite{Novak03} and \cite{Lee05}
-%  and (Case 3) a patent \cite{JoeScientist001}, work accepted for
-%  publication \cite{rous08}, 'YYYYb'-test for prolific author
-%  \cite{SaeediMEJ10} and \cite{SaeediJETC10}. Other cites might
-%  contain 'duplicate' DOI and URLs (some SIAM articles)
-%  \cite{Kirschmer:2010:AEI:1958016.1958018}. Boris / Barbara Beeton:
-%  multi-volume works as books \cite{MR781536} and \cite{MR781537}. A
-%  couple of citations with DOIs:
-%  \cite{2004:ITE:1009386.1010128,Kirschmer:2010:AEI:1958016.1958018}. Online
-%  citations: \cite{TUGInstmem, Thornburg01, CTANacmart}. Artifacts:
-%  \cite{R} and \cite{UMassCitations}.
 
 
 %%
@@ -287,7 +261,7 @@ Thanks.
 %% The next two lines define the bibliography style to be used, and
 %% the bibliography file.
 \bibliographystyle{ACM-Reference-Format}
-\bibliography{sample_paper}
+\bibliography{anderson_paper}
 
 \end{document}
 \endinput
