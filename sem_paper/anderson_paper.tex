@@ -194,7 +194,7 @@ Cases e and g from Figure~\ref{fig:noise} are examples of where the OCR may iden
 
 \subsection{Writing Systems}
 \label{sec:alphabet}
-The most commonly used writing systems, by number of users worldwide, are Latin, Chinese, then Arabic~\cite{Vaughan:2025}.
+The most commonly used writing systems, by number of users worldwide, are Latin, Chinese, and then Arabic~\cite{Vaughan:2025}.
 The majority of OCR models are trained to recognize characters from the Latin alphabet. 
 Most, but not all, documents from American institutions are written in English, a language which uses the Latin alphabet.
 As mentioned in Recognition~\ref{sec:Recognition}, OCR models are limited in what they can recognize, to the characters they were trained on.
@@ -233,6 +233,8 @@ Some OCR models, notably Tesseract, have adapted to use machine learning to reco
 To compare the accuracy of OCR models, the models must be run on the same collection of documents, a \textit{dataset}. If the goal of the model is to better handle the challenges identified in this paper, the dataset should include as many edge cases as possible. Due to the nature of layout and visual noise, it is inherently impossible to cover all scenarios. Covering every alphabet is similarly difficult, but to a lesser degree. 
 
 Serious consideration to storage constraints need to be had when making these data sets. Hegghammer's "Noisy OCR Dataset" (NOD), consists of 422 original documents with 43 variations of each, for a total of 18,568 documents. NOD, is about 26 GB when compressed and 193 GB uncompressed. Hegghammer recognizes in his paper that there is limited variation in the layouts of the Arabic documents he included. \todo[inline]{horrible news, i think this might be more, one noise type for a color version and one for black and white...}
+
+Improving accuracy is so important for applications such as digital document accessibility because and incorrectly identified character must be edited by hand.
 
 All that said, these individual datasets are an important step in progress towards improving OCR accuracy. The overall discussion of weaknesses in current OCR technology guide improvements to the technology. These specialized datasets made to address these challenges, while not all-encompassing, make space for developments in those specialized areas. Similarly, the techniques used to construct these datasets can be used to make more datasets which can cover more of these cases. By pushing the bounds of what OCR models can do, we can strengthen their current capabilities.
 
