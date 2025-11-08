@@ -111,7 +111,7 @@ Among other requirements, all scanned documents made publicly accessible by stat
 
 When a document is scanned, it becomes an image and looses all record of the content found on the original document. The first step to make a scanned document screen-readable is to recognize the text lost when the document was scanned. This process can be done manually, but that isn't well suited for large numbers of documents. Instead we look to \textit{Optical Character Recognition (OCR) models}, programs made to extract text from images.\todo[inline]{there's a little more to it, but generally some software that takes and input, applies all stages, then outputs something}
 
-The Background~\ref{background} of this paper covers the three main steps in OCR. Challenges~\ref{challenges} looks at how layout, alphabet, and visual noise impact OCR output accuracy. Results~\ref{results} section looks at two examples of datasets designed to address these challenges and looks at how the OCR model Tesseract has adapted to address some of these challenges. Conclusion~\ref{conclusion} discusses the importance of specialized datasets and their role in increasing accuracy of OCR.
+The Background~\ref{background} of this paper covers the three main steps in OCR. Challenges~\ref{challenges} looks at how layout, writing system, and visual noise impact OCR output accuracy. Results~\ref{results} section looks at two examples of datasets designed to address these challenges and looks at how the OCR model Tesseract has adapted to address some of these challenges. Conclusion~\ref{conclusion} discusses the importance of specialized datasets and their role in increasing accuracy of OCR.
 
 \section{Background}
 \label{background}
@@ -152,11 +152,16 @@ By creating this baseline and somewhat standardizing the characters, accuracy in
 The final step in the OCR process is referred to as Classification or Recognition.
 This step takes the boxes of individual characters from the last step and tries to identify the character inside of them.
 
-One common technique to identify an unknown character uses a process known as matrix matching. 
-In this process, the unknown character is compared to an existing collection of known characters, and the character with the most similarity is chosen. \cite{Thorat:2022}
-Another popular technique, called feature extraction uses measurements like character height, width, and presence of loops to identify a character.
-There are a lot of variations in classification techniques, but the key thing to note is that all methods use reference material as a basis to classify characters~\cite{Thorat:2022}.
-The output of this recognition step is inherently limited to characters the model has been trained on.
+One of the foundational techniques used in character recognition is known by a variety of names, one being Matrix Matching. The technique uses templates of known characters. In this process, the unknown character is compared to all of the templates. The output of Matrix Matching is a list of the templates and how similar they were to the unknown character. The template that is the most similar, is chosen as the identity of the unknown character.
+
+An increasingly popular technique for identifying characters uses Neural Networks. This technique is similar to Matrix Matching where the input is the unknown character, and the output is the full list of possible characters and a measure of confidence for each option. In Matrix Matching, each mismatched pixel has a uniform impact on the resulting similarity metric. In a Neural Network, each pixel and possible character outcome is given an associated weight. This means that the presence or absence of pixels can have a larger impact on the confidence in a certain character outcome. To compensate for the added complexity, a Neural Network will often include some method, an \textit{activation function}, which takes the input values and weights, and then scales them, so the resulting confidence measure is a percent between 0 and 100.
+
+Neural Networks are popular because the weights add a level of flexibility when it comes to identifying characters. Neural networks are more accommodating to types of fonts and variations in character rotation and placement. Neural Networks can also include a condition where if the confidence is low for all of the possible outcome characters, the unknown character will be added to the dictionary of possible outcomes. This feature makes it easier to identify unknown characters, but it is important to know that Neural Networks, like Matrix Matching, are still limited in some capacity by the characters they have been exposed to previously. Neural Networks can be trained to identify a larger number of characters, by intentional exposure.
+
+%Additionally Neural Networks use  an existing collection of known characters, and the character with the most similarity is chosen. \cite{Thorat:2022}
+% Another popular technique, called feature extraction uses measurements like character height, width, and presence of loops to identify a character.
+% There are a lot of variations in classification techniques, but the key thing to note is that all methods use reference material as a basis to classify characters~\cite{Thorat:2022}.
+% The output of this recognition step is inherently limited to characters the model has been trained on.
 % There are variations in classification techniques, including a subsection of OCR called Intelligent Character Recognition which uses machine learning, but all methods use some sort of training or reference material to classify.
 
 \section{Challenges}
