@@ -88,7 +88,7 @@ OCR has a wide variety of uses, with one common application being to digitize sc
 OCR has three main categories of challenges that reduce accuracy when applied to scanned documents, stemming from page layouts, the writing system used, and visual noise.
 By increasing the number of document collections that contain these variations, we make it easier to develop OCR techniques to target them.
 This paper looks at document collections for evaluating the extent of these weaknesses and researching methods to address them.
-Additionally, this paper looks at the role these collections can play in training neural network based OCR approaches.
+Additionally, this paper looks at the role these collections can play in training neural-network-based OCR approaches.
 \end{abstract}
 
 \doclicenseThis
@@ -112,157 +112,148 @@ Some examples are pages of notes, tax forms, and recipes.
 A common way to save and share these documents is to photograph them.
 This creates a \textit{scanned document}.
 
-For many reasons such as research and record keeping, the contents of the scanned document may be important.
+For many reasons such as research and record keeping, the contents of a scanned document may be important.
 Scanned documents do not contain machine-readable text.
-While text on a scanned document may be readable visually, no record of the contents are made when the image is made.
+While text on a scanned document may be readable visually, no record of the contents is made when the image is taken.
 As a consequence, it is not possible to edit or search within the text of a scanned document.
-One method to digitize a scanned document, is to read and re-type the contents.
+One method to digitize a scanned document is to read and re-type the contents.
 An alternative method is to use an \textit{Optical Character Recognition (OCR) model}.
 OCR models are programs specifically made to identify text from images.
+This paper focuses on an open-source OCR model called \textit{Tesseract}.
+This model is commonly used in OCR research because it is designed so the techniques used can be easily changed.
 
-OCR began as a tool to read messages for Blind people and later to convert messages to Morse code.
-As the technology developed, the purposed shifted to more commercial applications, such as record keeping.
+OCR began as a tool to read messages for blind people and was later used to convert messages to Morse code.
+As the technology developed, the purpose shifted to more commercial applications such as record keeping.
 The technology grew dramatically in popularity because it could reduce the human labor needed for data entry~\citep{Schantz:1982}.
 As applications for OCR have grown, the technology has been applied to increasingly diverse types of documents.
 Several aspects of documents play a role in the effectiveness of OCR on them.
-There is an increased need for OCR that works on a wide variety of documents.
-One of the big challenges to OCR accuracy is the writing system of the language of the document.
-As the third most used writing system, this paper uses examples of Arabic documents to discuss this topic. 
-The other two challenges, page layout and visual noise are covered, but to a lesser degree.
+% There is an increased need for OCR that works on a wide variety of documents.
+This paper covers the impact of page layout and the presence of visual noise on OCR output, in the context of English documents. 
+A large barrier to using OCR on scanned documents comes from the language of the document.
+Arabic is the third most used writing system.
+This paper uses examples of documents in languages, such as Persian, which use the Arabic writing system to discuss this challenge.
 
-%This paper looks at the stages of OCR and some of the emerging Techniques for addressing document variation.
-Section~\ref{background} of this paper, covers the stages and techniques used in OCR.
-The three challenges related to document variations are the page layout, the visual noise of the image, and the writing system used.
+Section~\ref{background} of this paper covers the three main stages of OCR, along with several techniques used in each of the steps.
 Section~\ref{challenges}, Challenges, looks at how layout, noise, and writing system specifically impact OCR.
-It covers how these challenges relate to the stages of OCR and covers some additional steps which can be used to minimize the effect.
-Section~\ref{datasets}, goes deeper into the techniques covered in Sections~\ref{background} and Section~\ref{challenges}, specifically into the datasets that were used to research these areas. 
-Section~\ref{conclusion}, Conclusion, discusses the importance of specialized datasets and their role in increasing accuracy of OCR.
+It covers how these challenges relate to the stages of OCR, and introduces additional steps which can be used to minimize the challenges.
+Section~\ref{datasets} goes deeper into the techniques covered in Sections~\ref{background}~and~\ref{challenges}, specifically into the datasets that were used to research these areas. 
+Section~\ref{discussion}, Discussion, introduces some ethics regarding datatsets and discusses the importance of specialized datasets and their role in increasing accuracy of OCR.
 
 \section{Stages and Techniques}
 \label{background}
 
 \begin{figure*}[t]
 \centering
-\includegraphics[width=\textwidth]{stages.png}
-\caption{Stages of OCR pictured on a Persian Document. Modified from Fateh et al~\cite{Fateh:2024}.}
+\includegraphics[width=\linewidth]{stages.png}
+\caption{Stages of OCR pictured on a Persian Document: Document Layout Analysis, Text Line Detection, and Recognition. Modified from Fateh et al.~\cite{Fateh:2024}.}
 \Description{A Persian document. An arrow with "DLA step" into the document with rectangles around each paragraph. An arrow for the TLD step leading to individual lines of text on a black background. A Recognition arrow leading to a document with a magnifying glass.}
 \label{fig:stages}
 \end{figure*}
 
 The input and output of the OCR process depends on the model used. 
 In general, the input is an image and the output is a text file.
-Some models, in addition to extracting text from the image will record the location of where the text was found to construct more complex output formats.
 Tesseract, an open-source model discussed in this paper, accepts a variety of file formats, mainly, PNG, JPEG, and TIFF files.
-Tesseract currently can format the output as plain text, HTML, as several types of PDFs, and more~\citep{tesseract:2025}.
+Some models will both extract text from images and record where the text was found.
+This additional information about the location of the text can be used to construct more complex output formats.
+Tesseract currently can format the output as plain text, HTML files, several types of PDFs, and more~\citep{tesseract:2025}.
 
-The process of OCR can be split into a number of stages, but for the purpose of this paper is made of three: \textit{Document Layout Analysis (DLA)}, \textit{Text Line Detection (TLD)}, and \textit{Recognition}.
-Two common stages which are not recognized in this list are a pre-processing and post-processing stage.
-Because these stages are not necessary to perform OCR, they are instead mentioned in Section~\ref{sec:noise} as noise-reduction techniques.
-
+The process of OCR can be split into a number of stages, but in this paper we discuss the main three: \textit{Document Layout Analysis (DLA)}, \textit{Text Line Detection (TLD)}, and \textit{Recognition}.
+\footnote{Two common stages which are not recognized in this list are a pre-processing and post-processing stage
+Because these stages are not necessary to perform OCR, they are instead mentioned in Section~\ref{sec:noise} as noise-reduction techniques.}
 Figure~\ref{fig:stages} shows a document, in Persian, going through each of the three stages of OCR, where the output of the model is the text identified from the document.
-%This is generally returned as plain text, but can include meta-information, such as the location on the source image the text came from~\footnote{Modern OCR models can use this meta-information and text to construct complex output formats like HTML files and can be used in combination with a graphic user interface to display the text output to highlight any potentially incorrectly identified characters.}.
 The first stage, DLA, breaks the image up into regions of text.
 For the example document, this is two paragraphs, a page number, and some isolated words.
-The second stage, TLD, breaks down the sections of text into individual lines of text.
-Some TLD methods will further break the lines of text down into into individual words or characters.
-The final stage, Recognition, identifies the text in each line and combines the results into one search-able text document.
+The second stage, TLD, breaks down the sections of text into subsections.
+The final stage, Recognition, identifies the text in each subsection and combines the results into one searchable text document.
 
 \subsection{Neural Networks}
 \label{sec:NNs}
 
-One technique which can be used in each of the three OCR stages, is to use \textit{Neural Networks}.
-Neural Networks are a subsection of Machine Learning meant for pattern recognition.
-These networks use large functions with many parameters to make predictions.
-In the context of OCR and scanned documents, these predictions are often if a region contains text, or are about the value of some text.
+\textit{Neural networks} are a method of machine learning meant for pattern recognition.
+These networks are important to the field of OCR because they can be used in all stages of the process.
+With the exception of neural networks used for the recognition stage, how these networks are being used is not unique to OCR.
+They are part of the larger field of computer vision, so they will not be covered in depth in this paper.
 
-To chose the parameters, or \textit{weights}, in the Neural Network, it must go through a training process.
-This process begins with a large collection of examples, \textit{a dataset}.
-Datasets can be anything from full documents to individual characters, depending on which stage the Neural Network will be used for.
-It is important for the training process that there is am existing machine-readable copy of the contents of the examples.
-The dataset is divided into two or more groups.
-The Neural Network is exposed to the first group of examples, to get a sense of patterns within the possible outcomes.
-In this step the Neural Network will set initial values for the weights.
-After exposure, the network is then exposed to the second group of examples.
-The network is meant to use the weights chosen in the earlier step to predict the values of the second set.
-The accuracy of the predictions are then used to adjust the weights in a way that minimizes errors.
-This process repeats as needed.
-If the dataset was divided up into more than two groups, the remaining examples can be used as a final measure for accuracy of the Neural Network's predictions.
+The one important thing to know about neural networks, is that they need to go through a training process to make any reasonably accurate prediction.
+In an abstract way, a neural network is a large mathematical function which uses many parameters to make predictions.
+To choose the parameters, a neural network must be exposed to a large amount of examples of each possible outcome.
+In the case of training a neural network for the recognition stage, these examples could be individual characters from a writing system.
+Collections of these examples are called \textit{datasets}.
+Part of the training process is to use the proposed parameters to make predictions about examples that the network has not been exposed to previously.
+The accuracy of the predictions is then used to modify the existing parameters to reduce the overall error.
+This process of exposure and adjustment are repeated until the accuracy has met some pre-defined threshold, or is no longer changing significantly between rounds.
 
-%A Neural Network takes the pixels of an image and maps them to a series of \textit{nodes}.
-%These nodes represent a possible pattern.
-%As the input pixels are mapped to the nodes, they are adjusted with a \textit{weight}, to assign a value. [assign a value to what?]
-%In the context of images, one possible representation of the input pixels can be a RGB value of the pixel. [bad example]
-%Weights are a series of values independent to the input image. 
-%At each node, the value of the input is modified with an \textit{activation function}.
-%A Neural Network can contain many layers of nodes.
-%An activation function is used at each layer to introduce complexity and further control the significance of certain patterns.
-%%% Neural Networks will add layers of nodes and activation functions to increase the complexity of patterns it can be applied to.
-%
-%To determine the weights, Neural networks going through a process called \textit{training}.
-%In this process, the neural Network is applied to a variety of documents with known content, a \textit{dataset}.
-%The output of the OCR stage is judged and the weights are adjusted to minimize error. 
-%Some examples of error in the the context of documents, could be part of the background that was marked as text, or could be a misidentified character.
+To ensure the neural network can be applied in a variety of cases, it is important that the dataset it was trained on was diverse.
+By intentionally including examples of the challenges discussed in this paper in a dataset, a neural network can slowly learn and adapt to these cases.
+To train neural networks on these challenges, there needs to be a large amount of diverse and publicly-available document datasets.%do this, there needs to be large, publicly-available, diverse datasets of documents.
 
 \subsection{Document Layout Analysis}
 \label{sec:DLA}
-The purpose of DLA is to identify what part of the input image is text and what is not.
+The purpose of DLA is to identify what part of the input document is text and what is not.
 To do this, a model can use a variety of techniques to draw rectangular boxes around the text.
-These boxes can be a variety of sizes and can contain varying amounts of text.
+These boxes can be many dimensions and can contain different amounts of text, depending on the OCR model and documents used.
 % A region can be many things, such as an isolated character, full paragraphs, or tables.
-The areas not captured by the boxes are ignored for the rest of the stages, to reduce the workload.
+The regions of the document which are not put in a text box during this stage are ignored for the following stages, to reduce the workload.
 
 An important step of DLA is preserving the reading order of the document, which can be non-obvious when it comes to documents beyond a single column of text.
 Features like the number of columns of text, and the presence of components like images and tables, disrupt a traditional top-down reading order.
 
-Fateh et al~\citep{Fateh:2024} propose a DLA method which uses a voting system on the output of four neural networks trained to recognize regions of text.
-Each of the four voting neural networks, use coordinates to record where on the original image the text was found.
-The study used Tesseract, a modular OCR model, as the foundation.
-The recognition stage of Tesseract, takes full lines of text as an input and returns full lines of machine-readable text as the output.
-Output formats of Tesseract, such as HTML and PDFs, do not recombine text from multi-line regions, like paragraphs.
+Fateh et al.~\citep{Fateh:2024} propose a DLA method which uses a voting system on the output of four neural networks trained to recognize regions of text.
+Each of the four voting neural networks use coordinates to record where on the original image the text was found.
+This voting method was added to the base version of Tesseract, which inputs and outputs full lines of text in the recognition stage.
+Output formats of Tesseract, such as HTML and PDFs, do not recombine text from multi-line regions like paragraphs.
 Instead, the text is left in individual text boxes.
+The human labor needed to combine text boxes of individual lines of text is less than the labor needed to combine individual characters.
+By keeping the OCR output in full lines of text, the models need to make fewer decisions about the reading order.
+This method reduces the human labor needed, which is often the end goal with increasing OCR accuracy, but does not directly address the challenge 
 %The output format chosen by the research team was the text in text boxes placed over the original image. 
-The need to preserve the document order is partially hidden when OCR is used in this way.
-The human labor needed to to combine text boxes of individual lines of text, is less than the labor needed to combine individual characters.
+The need to preserve the document order is partially hidden when OCR is used on full lines of text, like Tesseract does.
+
 % DLA becomes apparent when the model is used on individual characters or when the output is constrained to one column, like a plain text file.
 
 \subsection{Text Line Detection}
 \label{sec:TLD}
-TLD takes the previously identified regions of text and further breaks them down into lines, words, or individual characters.
-The output of TLD, is each identified unit of text in its own defined box of pixels.
-To best fit the text into the boxes, TLD may rotate, center or scale the text.
-Traditionally, these boxes have a uniform pre-set size.
-It is important for the boxes in question to be large enough to contain the intended character(s), but not to include characters from the neighboring lines or words. 
-This results in a long discussion of what is the proper size box.
+The input to the Text Line Detection stage is the previously identified regions of text.
+The output of TLD is determined by the technique to be used in the Recognition stage.
+Modern recognition techniques, such as neural networks~\ref{sec:NNs}, can be used on full lines of text.
+In those cases, the output of TLD is the lines of text from the provided region.
+For other recognition techniques, the lines may be broken down further into individual words or characters.
+The output of TLD is each identified unit of text in its own defined box of pixels.
+To best fit the text into the boxes, the TLD stage may include rotating, centering, or scaling the text.
+% Traditionally, these boxes have a uniform pre-set size.
 
-The size of the unit of text is determined by the technique used in the Recognition stage~\ref{sec:Recognition}.
-Modern techniques, such as Neural Networks~\ref{sec:NNs}, can be used on full lines of text, instead of individual characters.
-By ending the segmentation process at lines of text, instead of further breaking the text into individual characters, we can prevent introducing errors related to character overlap.
-One downside of using full lines of text, is that because they cover more of a page, the line has a larger capacity to be curved.
+%It is important for the boxes in question to be large enough to contain the intended character(s), but not to include characters from the neighboring lines or words. 
+%This results in a long discussion of what is the proper size box.
 
-Fateh et al~\citep{Fateh:2024} propose a TLD technique which uses font size to rotate and standardize full lines of text.
-This can be seen in Figure~\ref{fig:stages}, where the text entering the TLD step is at an angle, but the output is rotated, to create a baseline.
-By creating this baseline, and somewhat standardizing the characters, the accuracy when defining the characters is improved.
-% Two methods employed by Fateh et al\citep{Fateh:2024} used font size and correcting line rotation, to improve overall accuracy.
-To develop this technique, they built a special dataset made to include curved lines of text and lines with very little space in-between. 
+By using lines instead of words or characters as the final unit of text OCR methods can largely bypass errors introduced from dividing overlapping or connected characters.
+One downside of using full lines of text is that, as the length of the box increases, it is impacted more by the rotation or bend of the paper.
+This can be seen in Figure~\ref{fig:stages}, where the text entering the TLD step is at an angle.
+Fateh et al.~\citep{Fateh:2024} propose a TLD technique which uses the dimensions of characters in the document to rotate and standardize full lines of text.
+The result of this technique can be seen as the output of the TLD step in the figure.
+To develop this technique, the researchers built a special dataset made to include curved lines of text and lines with very little space in-between. 
+By somewhat standardizing the characters, the researchers were able to correctly identify 96.11\% of the regions of text in the dataset they created.
+The researchers compared their technique to four existing DLA techniques: Layout Parser, SSD, YOLOv3 and Faster R-CNN.
+The second best method to identify regions of text in this dataset was Faster R-CNN which was 93.67\% accurate.
 
 \subsection{Recognition}
 \label{sec:Recognition}
 The final step in the OCR process is to attempt to recognize the text identified in the document.
 Because OCR was originally developed to convert printed characters to sound, many of the initial recognition techniques are no longer used.
-When the technology moved from noise to text output, some techniques arose which are still relevant.
-One such technique is known by many names, one being Matrix Matching.
-Matrix Matching is important to understand because it is the foundation of many modern recognition techniques and can help explain the common restrictions in recognizing text.
+One technique which was popularized when OCR moved from sound to text output is known by many names, one being \textit{Matrix Matching}.
+This technique is important to understand because it is the foundation of many modern recognition techniques, and can help explain the common restrictions in recognizing text.
  
 Matrix Matching uses templates of known characters.
 In this process, a single unknown character is compared to all of the templates.
-For each template, the number of non-matching pixels between it and the single character are recorded.
+The templates and unknown character are represented as series of pixels, either with binary values or color codes that represent the shape of the character.
+The difference between the pixels in the template and the unknown character are recorded.
 The output of Matrix Matching is a list of the templates and how similar they were to the unknown character. 
-The identity of the template with the highest similarity, is chosen as the identity of the unknown character.
+The identity of the template with the highest similarity is chosen as the identity of the unknown character.
 
-Neural Networks are a popular technique in the Recognition stage.
-The networks work similarly to Matrix Matching, but the weights add a level of flexibility when it comes to identifying characters.
-Neural Networks are more accommodating to types of fonts and variations in character rotation and placement.
-Because of the training process for Neural Networks, through repeated exposure, it is also possible to train the model to predict previously unknown characters.
+Neural networks are a popular technique in the Recognition stage.
+The networks work similarly to Matrix Matching, but the parameters add a level of flexibility when it comes to identifying characters.
+Neural networks, especially when trained on a diverse dataset, are more accommodating to types of fonts and variations in character rotation and placement.
+This makes neural networks better suited for OCR applications involving inconsistent characters, such as handwritten documents, than Matrix Matching.
+% Because of the training process for Neural Networks, through repeated exposure, it is also possible to train the model to predict previously unknown characters.
 
 % There are a lot of variations in classification techniques, but the key thing to note is that all methods use reference material as a basis to classify characters~\cite{Thorat:2022}.
 % The output of this recognition step is inherently limited to characters the model has been trained on.
@@ -270,34 +261,35 @@ Because of the training process for Neural Networks, through repeated exposure, 
 \section{Challenges}
 \label{challenges}
 
-\begin{figure*}[h]
+There are many factors of scanned documents and OCR models which impact the accuracy of the resulting OCR output.
+These factors can be loosely categorized as the layout of the original document, the presence of visual noise, and the writing system used.
+
+\begin{figure*}
 \centering
 \includegraphics[width=\textwidth]{noise.png}
-\caption{Examples of visual noise: Blur, Weak Ink, Salt and Pepper, Scribbles, Ink Stains, and Watermarks.}
-\label{fig:noise}
+\caption{Examples of visual noise generated using code written by Hegghammer~\citep{Hegghammer:2022}: Weak Ink, Blur, Salt and Pepper, Scribbles, Ink Stains, and Watermarks.}
 \Description{Six white boxes with the words "sample text" and a type of visual noise applied.}
+\label{fig:noise}
 \end{figure*}
-
-There are three main categories of issues that decrease accuracy of OCR for documents.
-These categories are the layout of the original document, the presence of visual noise, and the writing system used.
-% Each of these challenges tie back to the key concept that OCR models work best when applied to what they were made to recognize.
 
 \subsection{Layout}
 \label{sec:layout}
 Documents come in many different layouts.
 Images, figures, number of columns, and similar aspects, add a layer of complexity to documents.
-In the DLA stage, and when the model outputs the final result, to be accurate, the model must have some method to record and replicate the reading order.
+In the DLA stage and when the model outputs the final result, to be accurate, the model must have some method to record and replicate the reading order.
 A paper formatted with two columns, such as this, is meant to be read left column, then right column.
 Unless otherwise instructed, an OCR model will take the first line from each column and treat them as one line. 
 
-Some OCR models are intentionally made to only handle one layout, such as a specific tax form, or a job application for a specific company. 
-A specialized OCR model, when applied to the layout it is made for yields higher accuracy.
+The placement of lines of text, specifically the distance between lines, can be considered a feature of the layout.
+While the other variations in layout have an impact on the reading order, line spacing impacts the content of text boxes.
+If lines of text are close together, or overlapping, the boxes drawn around the lines, will overlap.
+This can also occur if the lines of text curve or are at an angle.
+If a box contains part of a neighboring unit of text, that text will influence the results of the recognition stage, resulting in a higher rate of incorrectly identified characters.
+
+Some OCR models are intentionally made to only identify documents in a specific group of layouts, such as receipts or a tax form.
+These specialized models are given information about the layouts they should expect, which reduces the complexity of DLA and reconstructing the reading order, thus improving the quality of the OCR output.
 Layout specific-OCR strategies are not directly applicable to other layouts, and can not be readily combined with other layout-specific models.
 
-One related feature of document text, is line spacing. 
-If lines of text are close together, or overlapping, the boxes drawn around the lines, will overlap.
-This can also occur if the lines of text are at an angle, or are curved.
-This results in the offending overlap being taken into consideration when identifying the otherwise unrelated text. 
 %One related challenge to OCR accuracy, is curved lines of text. As seen in Figure~\ref{fig:stages}, the text on the source document was angled. In this figure you can also see that the DLA and TLD stages use rectangles to section off portions of text. By intentionally rotating the lines of text, the boxes are a tighter fit to the text, creating more consistency between the characters and increasing accuracy~\cite{Fateh:2024}.
 
 \subsection{Visual Noise}
@@ -305,42 +297,47 @@ This results in the offending overlap being taken into consideration when identi
 
 One big factor in the accuracy of OCR is the quality of the initial image. 
 Marks on the page, or noise acquired when the image was captured, add additional complexity to the OCR process. 
-In 2022, Thomas Hegghamer~\citep{Hegghammer:2022}, a historian, performed a bench-marking experiment to better understand how OCR models of the time were impacted by the types of noise he found in historical documents. 
+In 2022, Thomas Hegghammer~\citep{Hegghammer:2022}, a historian, performed a bench-marking experiment to better understand how OCR models of the time were impacted by the types of noise he found in historical documents.
+Hegghammer used Tesseract as one of the models he compared.
+This paper only discusses the results related to the Tesseract output accuracy.
 Figure~\ref{fig:noise} shows the six different types of visual noise he studied.
-To perform this experiment Hegghammer created a dataset based on 422 documents from two existing datasets.
-Hegghammer kept a color version of each of the documents and made a copy in black and white.
-To each of the versions, he then applied layers of each of the noise types, so each version had additional versions with zero, one, or two layers of noise.
+To perform this experiment, Hegghammer created a dataset based on 422 documents from two existing datasets.
+One of the datasets was made of old books in English, and the other was a collection of Arabic articles put together for the purpose of OCR research.
+Documents from both collections began with some degree of noise, but because the Arabic documents were synthetic, they contained less initial noise than the English documents.
+To each document, Hegghammer added combinations of one and two layers of noise.
+He then made a greyscale version of each initial document and repeated the proccess. 
+%To color and gray-scale versions of each document, Hegghammer added combinations of one and two layers of noise.
 
 Hegghammer came to two conclusions about the impact of noise on the OCR model's accuracy.
-First, documents with several layers of noise, produced OCR output with higher percentages of incorrect words, than those with less layers of noise.
-For Tesseract, on English documents, with no applied noise, the mean word error rate was 2.4\%.
+First, documents with several layers of added noise produced OCR output with higher percentages of incorrect words than those with fewer layers of noise.
+When Hegghammer used the Tesseract model on the English books with no added noise, he got a mean word error rate of  2.4\%.
+This means that in the OCR output, 2.4\% of words had at least one misidentified character.\footnote{Hegghammer uses the ISRI word accuracy tool, which does not count errors resulting from capitalization, or excess words.}
 For the same documents with one and two layers of noise, the mean word error rates were 23.3\% and 41.4\% respectively.
 
 Hegghammer's second finding was that \textit{integrated noise}, noise that was built into the document, had a larger impact on accuracy than \textit{superimposed noise}.
-In Figure~\ref{fig:noise}, Blur and Salt and Pepper are the two types of integrated noise.
-Scribbles, Ink Stains, and Watermarks, are considered superimposed noise.
-Weak ink does not neatly fit into either category.
-Of the English documents, with one layer of noise, the smallest mean word error rate for Tesseract came from the documents with weak ink applied.
-That mean value was 10.6\%.
-The second smallest value came from the documents with the Ink Stains applied, with a mean value of 16.1\%.
-The highest mean word error rate came from the documents with Salt and Pepper, applied, with a value of 70.2%.
-This means that over 70\% of the words in those documents had at least one misidentified character\footnote{Hegghammer uses the ISRI word accuracy tool, which does not count case errors or excess words.}.
+In Figure~\ref{fig:noise}, Blur and Salt and Pepper\footnote{Salt and Pepper is a unique noise type in this context because it adds color, similar to television static, to the image.} are the two types of integrated noise.
+Scribbles, Ink Stains, and Watermarks, are types of superimposed noise.
+Weak Ink does not neatly fit into either category.
+% The smallest mean word error rate from Tesseract on English documents with one layer of noise was 10.6\%.
+Of the English documents with one layer of noise applied, the noise type which resulted in the lowest mean word error rate was Weak Ink with a value of 10.6\%.
+The second smallest value came from the documents with Ink Stains applied, with a mean value of 16.1\%.
+The highest mean word error rate of this subsection of documents was 70.2\%, which came from documents with Salt and Pepper applied.
 
-Integrated noise impact the ability to distinguish the boundaries and lines of characters.
-Two additional ways that noise can reduce OCR accuracy, is by being mistaken for characters, or by covering up characters.
-In instances like, Scribbles and Watermark, from Figure~\ref{fig:noise}, the noise is made up of text, but is frequently not an indented part of the output.
-Because of the placement of Watermark, the superimposed character can be identified and inserted throughout the output.
-Noise types like Ink Stain can partially and fully obscure text.
-In these cases, a human reader is left to fill in the missing text, by guessing or attempting to counteract the stain.
-Obscured text in OCR can result in missing text and disrupts the reading order.
+Integrated noise impacts the ability to distinguish the boundaries and lines of characters.
+Two additional ways that noise can reduce OCR accuracy is by being mistaken for characters and by covering up characters.
+In instances like Scribbles and Watermark, from Figure~\ref{fig:noise}, the noise is made up of text, but is frequently not an indented part of the output.
+Because of the placement of Watermark, the superimposed characters can be identified and inserted throughout the output.
+Noise types like Ink Stain can partially or fully obscure text.
+In these cases, a human reader would use context clues to attempt to identify any missing characters.
+Without this logic in the OCR model, obscured text can result in missing text and can disrupt the reading order.
 
-The errors resulting from noise, can be addressed in two parts of the OCR process: pre-processing and post-processing.
-Avyodri et al~\citep{Avyodri:2022} performed a literature review of 29 OCR-related studies, to identify techniques used in pre-processing, post-processing and the three main OCR stages.
-Three out of the four papers related to pre-processing that they highlight are largely focused on addressing image rotation.
-Additional techniques used in this step were removing any borders, and sharpening or blurring regions of the image.
-five of the papers reviewed by Avyodri et al were focused on port-processing.
-All of the post-processing approaches Frequently, post-processing consists of removing spelling and grammatical errors.
-Some techniques use external spelling tools, such as Google's online spelling suggestions.
+The errors resulting from noise can be addressed in two parts of the OCR process: pre-processing and post-processing.
+Avyodri et al.~\citep{Avyodri:2022} performed a literature review of 29 OCR-related studies to identify techniques used in pre-processing, post-processing, and the three main OCR stages.
+Three out of the four papers related to pre-processing that they highlight are focused on image rotation.
+Additional techniques used in this step were to remove any borders, and to sharpen or blur regions of the image.
+Five of the papers reviewed by Avyodri et al. were focused on post-processing.
+All of the post-processing approaches consisted of removing spelling and grammatical errors.
+Some techniques used external spelling tools, such as Google's online spelling suggestions.
 
 %In figure~\ref{fig:noise} all noise types, with the exception of Salt and Pepper, can obscure the original text.
 %In these cases, part, or all, of a character is unidentifiable.
@@ -353,47 +350,58 @@ Some techniques use external spelling tools, such as Google's online spelling su
 \subsection{Writing Systems}
 \label{sec:alphabet}
 
-The most commonly used writing systems, by number of users worldwide: are Latin, Chinese, and then Arabic~\cite{Vaughan:2025}.
-The majority of OCR models are trained to recognize characters from the Latin alphabet. 
+The most commonly used writing systems, by number of users worldwide are Latin, Chinese, and then Arabic~\cite{Vaughan:2025}.
+The majority of OCR models are trained to recognize characters from the Latin writing system.\footnote{This includes many major languages like English and Spanish. These models generally also recognize the numbers and punctuation included in the American Standard Code for Information Interchange (ASCII) list of printable characters}
 % Most, but not all, documents from American institutions are written in English, a language based on the Latin alphabet.
-As mentioned in Recognition~\ref{sec:Recognition}, OCR models are generally limited in what characters they can recognize, to ones they have been exposed to previously.
-Additionally, the techniques used to identify Latin characters do not automatically extend to characters from other writing systems.
-The current limitations in identifying a variety of text types is most easily seen in non-Latin language documents, but also apply for documents with a variety of fonts, or documents with handwritten text.
+As mentioned in Section~\ref{sec:Recognition}, OCR models are generally limited in what characters they can recognize to ones they have been exposed to previously.
+For Matrix Matching, this limit is the collection of templates; for neural networks, it is the training dataset used.
+The techniques used to identify Latin characters do not automatically extend to characters from other writing systems.
+The current limitations in identifying a variety of text types is most easily seen in non-Latin language documents, but also apply to documents with a variety of fonts, or documents with handwritten text.
 
-Because of its popularity, and how different it is from Latin, Arabic is a relevant example to discuss this weakness in OCR.
-The Arabic alphabet has three main differences from Latin: the use of connected characters, the use of diacritics, and the reading order.
-
-\begin{figure*}
-  \includegraphics[width=0.5\textwidth]{arabic.png}
+\begin{figure}[h]
+  \includegraphics[width=3in]{arabic.png}
   \caption{The heading of the Latin Alphabet Wikipedia page, in Arabic.}
+  \Description{Arabic text where many of the characters are connected and there are dots above and below them.}
   \label{fig:alphabet}
-\end{figure*}
+\end{figure}
 
-\subsubsection{Connected Characters}
-
-Connected characters often appear in handwritten documents, regardless of writing system.
-Arabic is notable here because typed characters are also cursive, where typed Latin characters are not.
-% Arabic is a cursive language, where a character is connected to the characters before and after.
-In a study by Fateh et al~\cite{Fateh:2024} on improving TLD accuracy for Persian text, they found, to better account for connected characters, the boxes drawn around each character must be larger.
-The study specifically put forth a TLD technique which uses box sizes determined by the font size.
-The tested their TLD technique on three datasets, one they created, an existing Arabic dataset, and one existing Persian dataset.
-They found that for each of the datasets, when the proposed technique was used by Tesseract, as opposed to base Tesseract, the total error rate for text and diacritics dropped. The total error rate went from 6.235\% to 3.431\%, from 13.38\% to 1.52\%, and to from 6.22\% to 3.88\% for each of the datasets, respectively.
-This shows that accuracy of this OCR model on Arabic and Persian documents was greatly improved with the addition of this specialized TLD technique.
+Because of its prevalence, and how different it is from Latin, Arabic is a relevant example to discuss this weakness in OCR.
+The Arabic writing system has three main differences from Latin: the use of printed cursive characters, the use of diacritics, and the reading order.
+Figure~\ref{fig:alphabet} shows an example of Arabic text.
+Cursive characters are when a character is connected to the characters before or after them.
+Diacritics are marks around a main line of text.
+In Figure~\ref{fig:alphabet}, diacritics appear above and below the main line of text.
+Arabic is read from right to left, this is visible in Figure~\ref{fig:stages}, but not Figure~\ref{fig:alphabet}.
 
 \subsubsection{Diacritics}
 
 A diacritic is a small graphic symbol added to a letter.
 In Figure~\ref{fig:alphabet}, diacritics can be seen both above and below the main line of text.
-Written Arabic does not include vowels, and instead relies on the reader to use context clues to place them.
+Written Arabic does not include vowels and instead relies on the reader to use context clues to place them.
 Diacritics are especially important to the Arabic alphabet because they can be used to indicate the necessary vowel when the context is ambiguous~\cite{ArabicWiki:2025}.
+To OCR models, diacritics can be mistaken as separate characters and as visual noise.
+When a diacritic is removed from its associated text, important information about the content is lost.
 Diacritics appear in other Latin-based languages such as German and Spanish, but to a lesser degree.
-These diacritics can be mistaken for visual noise.
+
+\subsubsection{Cursive Characters}
+
+Cursive characters often appear in handwritten documents, regardless of writing system.
+Arabic is notable here because typed characters are also cursive, where typed Latin characters are not.
+% Arabic is a cursive language, where a character is connected to the characters before and after.
+In a study by Fateh et al.~\cite{Fateh:2024} on improving TLD accuracy for Persian text, they found that, to better account for connected characters, the boxes drawn around each character must be larger.
+The study specifically put forth a TLD technique which uses box sizes determined by the font size.
+The study compares the basic implementation of Tesseract and a version of Tesseract which was modified to use their proposed techniques.
+The researchers tested their TLD technique on three datasets, one they created, an existing Arabic dataset, and one existing Persian dataset.
+They measured accuracy as the percentage of characters, dots, and diacritics correctly identified. 
+They found that when they added their TLD technique to Tesseract, the total error rates for each of the three datasets went from 6.235\% to 3.431\%, from 13.38\% to 1.52\%, and from 6.22\% to 3.88\%, respectively.
+This shows that accuracy of this OCR model on Arabic and Persian documents was greatly improved with the addition of this specialized TLD technique.
 
 \subsubsection{Direction}
 
-The Arabic writing system is read from right to left, where the Latin writing system is read from left to right.
-During the DLA stage~\ref{sec:DLA}, and when the identified characters are assembled into the output, parts of the process must be reversed, to accommodate this.
-For writing systems such as those based on Chinese characters, where they are read top to bottom, the techniques used in OCR must be adjusted further, to change how the regions of text are drawn to begin with.
+The Arabic writing system is read from right to left, whereas the Latin writing system is read from left to right.
+During the DLA stage~\ref{sec:DLA}, and when the identified characters are assembled into the output, parts of the process must be reversed to accommodate this.
+Languages such as Chinese and Japanese are read top to bottom.
+In cases such as these, the techniques used in OCR must be adjusted further, to change how the regions of text are drawn to begin with.
 
 % Variations in fonts and alphabets introduce an added layer of complexity that need to be accounted for when performing the character recognition step. 
 % In many cases, such as the Cirrilic "", it adds confusion, where the character is mis-classififed as the Latin "H".
@@ -412,47 +420,74 @@ For writing systems such as those based on Chinese characters, where they are re
 %Superimposed noise referred to things like scribbles, ink stains, and watermarks.\cite{Hegghammer:2022}
 
 Thomas Hegghammer's effort to understand the effect of noise on OCR accuracy was limited by the datasets he used to compare models on, specifically in the variety of layouts present in the documents and in the types of noise.
+His limited layouts are a result of the source datasets he used.
+Hegghammer's old English books contained a moderate variety of layouts, but his Arabic articles were relatively uniform.
 Hegghammer says, ``While not an exhaustive list of possible noise types, they represent several of the most common ones found in historical document scans.''
-Additionally, he remarks, that if not restricted by dataset size and computation costs, the dataset could have been expanded to cover up to 10-20 total noise types, instead of the six he used.
-The total dataset consists of 422 documents, with 43 variations of each, for a total of 18,568 documents.
-When compressed, these files are about 26 GB and are about 193 GB uncompressed.
+Hegghammer remarks that if not restricted by dataset size and computation costs, the dataset could have been expanded to cover up to 10-20 total noise types, instead of the six he used.
+The total dataset consists of 422 documents with 43 variations of each for a total of 18,568 documents.
+When compressed, these files are about 26 GiB and are about 193 GiB uncompressed.
+The number of documents impacts the time needed to run the experiment and introduces a challenge when it comes to storing the dataset.
 % {belongs in conclusion} Even with this limitation, his study gives insight into the scale of impact noise had on the models he tested and gives insight into what noise has a more pronounced impact.
-Thomas Hegghamer made contents of his dataset publicly available, along with the noise generator he made, and the output from each of the models evaluated, for each of the documents.
+Thomas Hegghammer made the contents of his dataset publicly available, along with the noise generator he made and the output from the models he evaluated.
 
-Fateh et al~\cite{Fateh:2024} look at new methods to improve accuracy of the TLD and DLA steps when applied to Persian text.
-Persian is derived from the Arabic script.
+Fateh et al.~\cite{Fateh:2024} look at new methods to improve accuracy of OCR for Persian text, which uses the Arabic writing system.
 In this paper, the authors discuss the use of separate datasets to test their proposed TLD and DLA methods.
 This paper highlights several DLA-specific datasets which utilize newspapers and magazine collections to provide a variety of layouts.
-When it came to testing their TLD method, they specifically note: ``TLD in complex scripts like Persian and Arabic presents unique challenges, and the availability of suitable standard datasets is limited. Unlike English or other widely studied languages, Persian and Arabic require specialized datasets and approaches to tackle text line extraction effectively.''
-In total, this paper used three TLD datasets, and five DLA datasets.
-Of the three TLD datasets, one of them was specifically created for this study.
-The Official Iranian Newspapers (OIN) dataset, which is made of images of Iranian newspapers, was made to have rotated lines of text, regions with closely spaced lines, and to have a large amount of diacritics. 
+When it came to testing their TLD method, they specifically note: ``TLD in complex scripts like Persian and Arabic presents unique challenges, and the availability of suitable standard datasets is limited.''
+In total, this paper used three TLD datasets and five DLA datasets.
+Of the three TLD datasets, one was specifically created for this study.
+That dataset, which is made of images of Iranian newspapers, was made to include rotated lines of text, regions with closely spaced lines, and to have a large amount of diacritics. 
 
-% Some OCR models, notably Tesseract, have adapted to use machine learning to recognize text. Machine learning, in this case, works like matrix matching, discussed in Recognition~\ref{sec:Recognition}, with the advantage that the existing collection of known characters is updated as the model is used on more documents. This method is better suited to recognize a variety of fonts and alphabets, but is still limited in some capacity by its access to a variety of documents. Tesseract has also removed the Text Line Detection Step, instead of identifying text by individual characters, it uses full lines of text. This reduces errors introduced when segmenting the text and minimizes the steps needed to reconstruct the text to output it.\todo[inline]{cite}
+\section{Discussion}
+\label{discussion}
 
-\section{Conclusion}
-\label{conclusion}
+\subsection{Accuracy}
+\label{sec:accuracy}
 
-A 2022 literature review of OCR research papers found that several implementations and techniques for English scanned documents resulted in accuracy rates above 90\%.
-In some cases, techniques employed resulted in accuracy rates as high as 98 and 99\%~\cite{Avyodri:2022}.
+It is hard to have a discussion about the state of OCR accuracy because there are several ways to measure accuracy. 
+Different accuracy measures are relevant to different applications of OCR.
+If the OCR output is going to be used for sentiment analysis, overall word accuracy would be a sufficient measurement.
+If the OCR output is for something like data entry, character accuracy would be a better measure.
+
+In a literature review of OCR techniques by Avyodri et al.~\citep{Avyodri:2022}, the authors identified several studies which resulted in OCR character accuracy rates above 90\% for scanned documents.
+Two notable accuracy rates achieved by these studies are a 99\% average character accuracy rate for 20,000 English financial documents and a single instance of 99.8\% accuracy for Japanese characters.\footnote{These are references number 23 and 26 in the Avyodri et al. review.}
+Neither paper lists the exact formula used to calculate character accuracy, but from this we can still say that by some metrics, the OCR output produced by these methods are very similar to the known contents of the starting documents.
 While this is impressive, when taken in the context of larger bodies of work, this still leaves a large amount of errors.
 In projects, where truthful representation of the source documents is a high priority, these errors are often fixed using human labor.
-For small projects with limited resources, and large scale digitization efforts, any change in human labor required can have a significant effect.
+For projects with limited resources or large counts of content, any change in the human labor required to digitize the documents can have a significant effect.
 
-Pre-developed specialized datasets help support research for real applications of OCR.
-The motivation behind Thomas Hegghamer's study was his experience as a historian working with scanned documents~\citep{Hegghammer:2022}. 
-His dataset built off of two existing datasets.
-Specialized datasets fill a niche needed for this technology, while working within storage and processing constraints. 
+\subsection{Ethics}
+\label{sec:ethics}
 
-The increasingly specialized datasets created for recent OCR developments, serve to better understand and improve accuracy in their respective cases, but also serve a purpose in the wider OCR field.
-Many of the techniques developed for these cases, can also be applied to current applications of OCR.
-For example, the techniques designed to recognize cursive characters in Arabic, also work for many handwritten documents.
+As rapid development of neural networks expand the abilities of OCR, we need to consider the ethics of how people get the documents used to train these models.
+Some models of artificial intelligence are trained on source material which was taken without the permission of the content creators.
+This can come with legal ramifications such as copyright infringement.
+There are some differences between historical and modern documents which come from the development of the printing press and the evolution of language.
+These differences can impact the frequency of certain characters and the presence of certain document layouts.
+With the exception of neural networks trained for specific layouts and time periods, there is no explicit benefit to using exclusively modern documents in a training dataset.\footnote{One example of a modern layout is a tax form. Because these forms often contain sensitive information, this would be a good area to use synthetic documents.}
+By utilizing public domain content and by generating documents to be used as datasets, researchers can support a more ethical model of training this application of neural networks.
 
-With the increase in OCR techniques that use neural networks, these datasets develop a second purpose, to train models.
-Due to the nature of the challenges presented in this paper, it is not realistic to create a dataset which contains every major document variation.
-With the development of these specialized datasets, comes tools that were designed to generate them.
-Between existing publicly available datasets, and these tools, it becomes incrementally easier to develop more datasets which cover the true diversity of documents.
-By understanding how the training of neural networks effects the capabilities of OCR models, we can understand the importance of intentionally introducing a variety of documents to the training process.
+\subsection{Conclusion}
+\label{conclusion}
+
+Specialized datasets help researchers to better understand and develop techniques for these scenarios.
+These developments address a need for accuracy in practical applications of OCR.
+Additionally, some of the emerging techniques can be applied to documents outside of their specific context.
+%The specialized datasets created for recent OCR developments help researchers to better understand and improve accuracy of those cases.
+% The increasingly specialized datasets created for recent OCR developments, serve to better understand and improve accuracy in their respective cases, but also serve a purpose in the wider OCR field.
+% Many of the techniques developed for these cases, can also be applied to current applications of OCR.
+For example, the techniques designed to recognize cursive characters in Arabic also work for many handwritten documents in other languages such as English.
+
+The studies performed by Hegghammer and Fateh et al. built upon existing datasets.
+While the datasets they used did not perfectly fit the specific characteristic of documents they were studying, they served as foundation.
+Accuracy improvements for these real applications of OCR are made possible by pre-existing, publicly available, specialized datasets.
+% By making their datasets publicly available, and by Hegghammer making his noise generation algorithm publicly available, they allow their work to be the building blocks for others.
+By distributing the labor required to build these datasets, and by reducing the resources needed to access and store them, researchers support the development of more specialized datasets.
+
+There is a need for specialized datasets to increase OCR accuracy.
+For this technology, datasets serve a dual purpose: to develop new techniques and to train neural networks.
+At this point it is unrealistic to cover every possible document variation, but making these specialized datasets helps to gradually broaden the application of this technology.
+
 
 % All of these findings were made possible because of specialized datasets.
 %Both Hegghamer and the Fateh research team utilized and built off of existing datasets.
@@ -470,7 +505,7 @@ By understanding how the training of neural networks effects the capabilities of
 %To compare the accuracy of OCR models, the models must be run on the same collection of documents, a \textit{dataset}.
 %Hegghammer's findings do not work directly to increase OCR accuracy, but his findings support future research in this field.
 %His paper very directly identifies specific noise types that had the largest impact on OCR accuracy.
-%Hegghammer's dataset and the dataset used by Fateh et al were built off of existing datasets.
+%Hegghammer's dataset and the dataset used by Fateh et al. were built off of existing datasets.
 %By reducing the labor required to make datasets, it becomes easier to make specialized datasets to begin to cover the challenges identified in this paper.
 %Hegghammer continued this cycle, by making his dataset and noise generator publicly available.
 %These future datasets can then be used to both evaluate models and to train models.
@@ -500,7 +535,7 @@ By understanding how the training of neural networks effects the capabilities of
 %% identification of the section in the article metadata, and the
 %% consistent spelling of the heading.
 \begin{acks}
-Thank you to my adviser, Elena Machkasova, and to my proofreader, Skatje Myers.
+Thank you to my adviser, Elena Machkasova, to my alumna reviewer, Skatje Myers, and to my peer reviewer, Josie Barber.
 \end{acks}
 
 %%
